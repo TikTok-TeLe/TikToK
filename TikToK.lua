@@ -2288,6 +2288,22 @@ send(msg.chat_id_, msg.id_,'⌔︙تم حفظ كليشه امر /start في ال
 redis:del(bot_id..'Set:Cmd:Start:Bot') 
 return false
 end
+
+
+if text == ("تحديث السورس") and Dev_TikToK(msg) then  
+send(msg.chat_id_,msg.id_,'☑┇تم التحديث')
+os.execute('rm -rf TikToK.lua')
+download_to_file('https://raw.githubusercontent.com/TikToKtele/TikToK/master/TikToK.lua', 'TikToK.lua') 
+dofile('TikToK.lua')  
+return false
+end
+
+if text == "تحديث" and Dev_TikToK(msg) then
+dofile("TikToK.lua")  
+send(msg.chat_id_, msg.id_, "☑┇تم التحديث")
+end
+
+
 ------------------------------------------------------------------------------------------------------------
 end
 if TypeForChat == ("ForUser") then
@@ -2731,23 +2747,7 @@ send(msg.chat_id_, msg.id_,'⌔︙ تم تعطيل التواصل ')
 end
 end 
 end
-----------------------------------------------------------
-----------------------------------------------------------
-elseif text == "تحديث الملفات 🔁" then
-dofile("TikToK.lua")  
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث ملفات البوت")
-elseif text == "تحديث" then
-dofile("TikToK.lua")  
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث ملفات البوت")
-elseif text == 'تحديث السورس 🔂' then
-download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
-elseif text == 'تحديث السورس' then
-download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
-end
-----------------------------------------------------------
-----------------------------------------------------------
+
 if TypeForChat == ("ForSuppur") then
 if text ==  ""..Name_Bot..' شنو رئيك بهاذا' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id.."Status:Fun:Bots"..msg.chat_id_) then     
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, function(Arg,Data) 
