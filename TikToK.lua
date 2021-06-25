@@ -2289,8 +2289,7 @@ redis:del(bot_id..'Set:Cmd:Start:Bot')
 return false
 end
 
-
-if text == ("تحديث السورس") and Dev_TikToK(msg) then  
+if text == "تحديث السورس" and Dev_TikToK(msg) then  
 send(msg.chat_id_,msg.id_,'☑┇تم التحديث')
 os.execute('rm -rf TikToK.lua')
 download_to_file('https://raw.githubusercontent.com/TikToKtele/TikToK/master/TikToK.lua', 'TikToK.lua') 
@@ -2302,7 +2301,6 @@ if text == "تحديث" and Dev_TikToK(msg) then
 dofile("TikToK.lua")  
 send(msg.chat_id_, msg.id_, "☑┇تم التحديث")
 end
-
 
 ------------------------------------------------------------------------------------------------------------
 end
