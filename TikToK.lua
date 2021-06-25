@@ -479,7 +479,7 @@ height_ = 0
 end
 ------------------------------------------------------------------------------------------------------------
 function tdcli_update_callback_value(Data) 
-url = 'https://raw.githubusercontent.com/TikToKTeam/TikToK/master/TikToK.lua'
+url = 'https://raw.githubusercontent.com/TikToKTeam/TikToK/main/TikToK.lua'
 file_path = 'TikToK.lua'
 local respbody = {} 
 local options = { url = url, sink = ltn12.sink.table(respbody), redirect = true } 
@@ -499,7 +499,7 @@ end
 ------------------------------------------------------------------------------------------------------------ 
 function tdcli_update_callback_value_(Data) 
 tdcli_update_callback_value(Data) 
-url = 'https://raw.githubusercontent.com/TikToKTeam/TikToK/master/TikToK.lua'
+url = 'https://raw.githubusercontent.com/TikToKTeam/TikToK/main/TikToK.lua'
 file_path = 'TikToK.lua'
 local respbody = {} 
 local options = { url = url, sink = ltn12.sink.table(respbody), redirect = true } 
@@ -2118,6 +2118,26 @@ redis:srem(bot_id.."List:Rd:Sudo", text)
 return false
 end
 end
+
+if Dev_TikToK(msg) then
+if text == "تحديث الملفات 🔁" then
+dofile("TikToK.lua")  
+send(msg.chat_id_, msg.id_, "🔂┇تم تحديث ملفات البوت")
+elseif text == "تحديث" then
+dofile("TikToK.lua")  
+send(msg.chat_id_, msg.id_, "🔂┇تم تحديث ملفات البوت")
+elseif text == 'تحديث السورس 🔂' then
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
+--download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/Script.lua','Script.lua') 
+send(msg.chat_id_, msg.id_, "🔂┇تم تحديث السورس وتنزيل اخر تحديث للملفات")
+elseif text == 'تحديث السورس' then
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
+--download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/Script.lua','Script.lua') 
+send(msg.chat_id_, msg.id_, "🔂┇تم تحديث السورس وتنزيل اخر تحديث للملفات")
+end
+
+
+
 if Dev_TikToK(msg) then
 if text == 'نقل الاحصائيات' then
 local Users = redis:smembers(bot_id.."TikToK:UsersBot")
@@ -2165,7 +2185,7 @@ Files = '⌔︙ لا توجد ملفات في البوت '
 end
 send(msg.chat_id_, msg.id_,Files)
 elseif text == "متجر الملفات" or text == 'المتجر' then
-local Get_Files, res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/master/getfile.json")
+local Get_Files, res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/main/getfile.json")
 if res == 200 then
 local Get_info, res = pcall(JSON.decode,Get_Files);
 if Get_info then
@@ -2194,7 +2214,7 @@ send(msg.chat_id_,msg.id_,"⌔︙تم مسح جميع ملفات المفعله"
 elseif text and text:match("^(تعطيل ملف) (.*)(.lua)$") then
 local File_Get = {string.match(text, "^(تعطيل ملف) (.*)(.lua)$")}
 local File_Name = File_Get[2]..'.lua'
-local Get_Json, Res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/master/Files_TikToK/"..File_Name)
+local Get_Json, Res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/main/Files_TikToK/"..File_Name)
 if Res == 200 then
 os.execute("rm -fr Files/"..File_Name)
 send(msg.chat_id_, msg.id_,"\n⌔︙الملف ← *"..File_Name.."*\n⌔︙تم تعطيله وحذفه من البوت بنجاح") 
@@ -2205,7 +2225,7 @@ end
 elseif text and text:match("^(تفعيل ملف) (.*)(.lua)$") then
 local File_Get = {string.match(text, "^(تفعيل ملف) (.*)(.lua)$")}
 local File_Name = File_Get[2]..'.lua'
-local Get_Json, Res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/master/Files_TikToK/"..File_Name)
+local Get_Json, Res = https.request("https://raw.githubusercontent.com/TikToKTeam/Files_TikToK/main/Files_TikToK/"..File_Name)
 if Res == 200 then
 local ChekAuto = io.open("Files/"..File_Name,'w+')
 ChekAuto:write(Get_Json)
@@ -2288,20 +2308,6 @@ send(msg.chat_id_, msg.id_,'⌔︙تم حفظ كليشه امر /start في ال
 redis:del(bot_id..'Set:Cmd:Start:Bot') 
 return false
 end
-
-if text == "تحديث السورس" and Dev_TikToK(msg) then  
-send(msg.chat_id_,msg.id_,'☑┇تم التحديث')
-os.execute('rm -rf TikToK.lua')
-download_to_file('https://raw.githubusercontent.com/TikToKtele/TikToK/master/TikToK.lua', 'TikToK.lua') 
-dofile('TikToK.lua')  
-return false
-end
-
-if text == "تحديث" and Dev_TikToK(msg) then
-dofile("TikToK.lua")  
-send(msg.chat_id_, msg.id_, "☑┇تم التحديث")
-end
-
 ------------------------------------------------------------------------------------------------------------
 end
 if TypeForChat == ("ForUser") then
