@@ -5,121 +5,13 @@ json = dofile("./lib/JSON.lua")
 URL = dofile("./lib/url.lua")
 serpent = dofile("./lib/serpent.lua")
 redis = dofile("./lib/redis.lua").connect("127.0.0.1", 6379)
-Server_TikToK = io.popen("echo $SSH_CLIENT | awk '{ print $1}'"):read('*a')
-------------------------------------------------------------------------------------------------------------
-local function Load_File()
-local f = io.open("./Info_Sudo.lua", "r")  
-if not f then   
-if not redis:get(Server_TikToK.."Token_DevTikToK") then
-io.write('\n\27[1;35m- Send Token For Bot : ارسل توكن البوت ...\n\27[0;39;49m')
-local token = io.read()
-if token ~= '' then
-local url , res = https.request('https://api.telegram.org/bot'..token..'/getMe')
-if res ~= 200 then
-io.write('\n\27[1;31m- Token Is Communication Error\n التوكن غلط جرب مره اخره \n\27[0;39;49m')
-else
-io.write('\n\27[1;31m- Done Save Token : تم حفظ التوكن \n\27[0;39;49m')
-redis:set(Server_TikToK.."Token_DevTikToK",token)
-end 
-else
-io.write('\n\27[1;31m⌔︙Token was not saved \n لم يتم حفظ التوكن \n\27[0;39;49m')
-end 
-os.execute('lua TikToK.lua')
-end
-------------------------------------------------------------------------------------------------------------
-if not redis:get(Server_TikToK.."User_DevTikToK1") then
-io.write('\n\27[1;35m- Send ID For Sudo : ارسل ايدي المطور الاساسي ...\n\27[0;39;49m')
-local User_Sudo = io.read():gsub('@','')
-if User_Sudo ~= '' then
-io.write('\n\27[1;31m- The ID Is Saved : تم حفظ ايدي المطور\n\27[0;39;49m')
-redis:set(Server_TikToK.."Id_DevTikToK",User_Sudo)
-io.write('\n\27[1;35m- Send UserName For Sudo : ارسل معرف المطور الاساسي ...\n\27[0;39;49m')
-local User_Sudo2 = io.read():gsub('@','')
-if User_Sudo ~= '' then
-redis:set(Server_TikToK.."User_DevTikToK1",User_Sudo2)
-end
-else
-io.write('\n\27[1;31m- The ID was not Saved : لم يتم حفظ ايدي المطور الاساسي\n\27[0;39;49m')
-end 
-os.execute('lua TikToK.lua')
-end
-------------------------------------------------------------------------------------------------------------
-local DevTikToK_Info_Sudo = io.open("Info_Sudo.lua", 'w')
-DevTikToK_Info_Sudo:write([[
-do 
-local TikToK_INFO = {
-Id_DevTikToK = ]]..redis:get(Server_TikToK.."Id_DevTikToK")..[[,
-UserName_TikToK = "]]..redis:get(Server_TikToK.."User_DevTikToK1")..[[",
-Token_Bot = "]]..redis:get(Server_TikToK.."Token_DevTikToK")..[["
-}
-return TikToK_INFO
-end
-
-]])
-DevTikToK_Info_Sudo:close()
-------------------------------------------------------------------------------------------------------------
-local Run_File_TikToK = io.open("TikToK", 'w')
-Run_File_TikToK:write([[
-#!/usr/bin/env bash
-cd $HOME/TikToK
-token="]]..redis:get(Server_TikToK.."Token_DevTikToK")..[["
-while(true) do
-rm -fr ../.telegram-cli
-./tg -s ./TikToK.lua -p PROFILE --bot=$token
-done
-]])
-Run_File_TikToK:close()
-------------------------------------------------------------------------------------------------------------
-local Run_SM = io.open("tk", 'w')
-Run_SM:write([[
-#!/usr/bin/env bash
-cd $HOME/TikToK
-while(true) do
-rm -fr ../.telegram-cli
-screen -S TikToK -X kill
-screen -S TikToK ./TikToK
-done
-]])
-Run_SM:close()
-io.popen("mkdir Files")
-os.execute('chmod +x tg')
-os.execute('chmod +x TikToK')
-os.execute('chmod +x tk')
-os.execute('./tk')
-Status = true
-else   
-f:close()  
-redis:del(Server_TikToK.."Token_DevTikToK");redis:del(Server_TikToK.."Id_DevTikToK");redis:del(Server_TikToK.."User_DevTikToK1")
-Status = false
-end  
-return Status
-end
-Load_File()
-print("\27[36m"..[[                                           
- _____ _ _    _____     _    
-|_   _(_) | _|_   _|__ | | __
-  | | | | |/ / | |/ _ \| |/ /
-  | | | |   <  | | (_) |   < 
-  |_| |_|_|\_\ |_|\___/|_|\_\
-
-• ~ Ch - @XMGXM
-• ~ Dev - @VlVlVI
-
-• ~ TeAm Soerce TikToK TeLegram ...
-]]..'\27[m')
-------------------------------------------------------------------------------------------------------------
 sudos = dofile("./Info_Sudo.lua")
 token = sudos.Token_Bot
 UserName = sudos.UserName_TikToK
 bot_id = token:match("(%d+)")  
 Id_Dev = sudos.Id_DevTikToK
-Ids_Dev = {sudos.Id_DevTikToK,bot_id}
-Ids_Dev = {sudos.Id_DevTikToK,909438744,667869951,665877797,332581832,bot_id}
+Ids_Dev = {sudos.Id_DevTikToK}
 Name_Bot = redis:get(bot_id.."Redis:Name:Bot") or "تيك توك"
-------------------------------------------------------------------------------------------------------------
-function var(value)  
-print(serpent.block(value, {comment=false}))   
-end 
 function dl_cb(arg,data)
 -- var(data)  
 end
@@ -140,7 +32,7 @@ idbot = true
 end  
 return idbot  
 end 
-local function Dev_TikToK_User(user)  
+function Dev_TikToK_User(user)  
 local Dev_TikToK_User = false  
 for k,v in pairs(Ids_Dev) do  
 if user == v then  
@@ -149,119 +41,53 @@ end
 end  
 return Dev_TikToK_User  
 end 
-local function DeveloperBot(msg) 
-deved = false
+function DeveloperBot(msg) 
 local Status = redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) 
-if Status then
-deved = true  
-end
-if Dev_TikToK(msg) == true then  
-deved = true  
+if Status or Dev_TikToK(msg) or Bot(msg) then  
+return true  
+else  
+return false  
 end  
-return deved
 end
 function PresidentGroup(msg)
-PresidentGroup = false
 local hash = redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) 
-if hash then 
-PresidentGroup = true  
-end
-if Dev_TikToK(msg) == true then  
-PresidentGroup = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-PresidentGroup = true  
+if hash or Dev_TikToK(msg) or DeveloperBot(msg) or Bot(msg) then  
+return true 
+else 
+return false 
 end 
-return PresidentGroup
 end
 function Constructor(msg)
-Constructor = false    
 local hash = redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) 
-if hash then 
-Constructor = true  
-end
-if Dev_TikToK(msg) == true then  
-Constructor = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Constructor = true  
+if hash or Dev_TikToK(msg) or DeveloperBot(msg) or PresidentGroup(msg) or Bot(msg) then     
+return true    
+else    
+return false    
 end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Constructor = true  
-end
-return Constructor
 end
 function Owner(msg)
-Owner = false
 local hash = redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_)    
-if hash then 
-Owner = true  
-end
-if Dev_TikToK(msg) == true then  
-Owner = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Owner = true  
+if hash or Dev_TikToK(msg) or DeveloperBot(msg) or PresidentGroup(msg) or Constructor(msg) or Bot(msg) then     
+return true    
+else    
+return false    
 end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Owner = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-Owner = true  
-end
-return Owner
 end
 function Admin(msg)
-Admiin = false
 local hash = redis:sismember(bot_id..'Admin:Group'..msg.chat_id_,msg.sender_user_id_)    
-if hash then 
-Admiin = true  
-end
-if Dev_TikToK(msg) == true then  
-Admiin = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Admiin = true  
+if hash or Dev_TikToK(msg) or DeveloperBot(msg) or PresidentGroup(msg) or Constructor(msg) or Owner(msg) or Bot(msg) then     
+return true    
+else    
+return false    
 end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Admiin = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-Admiin = true  
-end
-if redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_) then  
-Admiin = true  
-end
-return Admiin 
 end
 function Vips(msg)
-vipss = false 
 local hash = redis:sismember(bot_id..'Vip:Group'..msg.chat_id_,msg.sender_user_id_) 
-if hash then 
-vipss = true  
-end
-if Dev_TikToK(msg) == true then  
-vipss = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-vipss = true  
+if hash or Dev_TikToK(msg) or DeveloperBot(msg) or PresidentGroup(msg) or Constructor(msg) or Owner(msg) or Admin(msg) or Bot(msg) then     
+return true 
+else 
+return false 
 end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Admin:Group'..msg.chat_id_,msg.sender_user_id_) then       
-vipss = true  
-end 
-if Bot(msg)  == true then       
-vipss = true  
-end 
-return vipss
 end
 ------------------------------------------------------------------------------------------------------------
 function Rank_Checking(user_id,chat_id)
@@ -609,7 +435,7 @@ tdcli_function ({ID = "GetUser",user_id_ = user_id},function(arg,data)
 if data.first_name_ ~= false then
 local UserName = (data.username_ or "Cispar")
 for gmatch in string.gmatch(data.first_name_, "[^%s]+") do
-data.first_name_ = gmatch or 'TikToK'
+data.first_name_ = gmatch
 end
 if status == "Close_Status" then
 send(msg.chat_id_, msg.id_,"⌔︙بواسطه -› ["..data.first_name_.."](T.me/"..UserName..")".."\n"..text.."")
@@ -757,10 +583,10 @@ if JsonFile and not JsonFile:match('.json') then
 send(chat,msg.id_,"*⌔︙عذرا الملف ليس بصيغة ال : Json*")
 return false
 end
--- if tonumber(JsonFile:match('(%d+)')) ~= tonumber(bot_id) then 
--- send(chat,msg.id_,"⌔︙الملف لا يتوافق مع البوت يرجى رفع ملف نسخة الكروبات الحقيفي")   
--- return false 
--- end      
+if tonumber(JsonFile:match('(%d+)')) ~= tonumber(bot_id) then 
+send(chat,msg.id_,"⌔︙الملف لا يتوافق مع البوت يرجى رفع ملف نسخة الكروبات الحقيفي")   
+return false 
+end      
 local File = json:decode(https.request('https://api.telegram.org/bot'..token..'/getfile?file_id='..File_id) ) 
 download_to_file('https://api.telegram.org/file/bot'..token..'/'..File.result.file_path,''..JsonFile) 
 send(chat,msg.id_,"⌔︙جاري بدء رفع الكروبات وتحويل الخزن ...")   
@@ -847,1470 +673,7 @@ end
 end
 send(chat,msg.id_,"⌔︙تم رفع ملف الخزن بنجاح\n⌔︙تم استرجاع جميع الكروبات ورفع المنشئين والمدراء في البوت")   
 end
-------------------------------------------------------------------------------------------------------------
-function Dev_TikToK_File(msg,data)
-if msg then
-msg = data.message_
-text = msg.content_.text_
-local function DeveloperBot(msg) 
-deved = false
-local Status = redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) 
-if Status then
-deved = true  
-end
-if Dev_TikToK(msg) == true then  
-deved = true  
-end  
-return deved
-end
-function PresidentGroup(msg)
-PresidentGroup = false
-local hash = redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) 
-if hash then 
-PresidentGroup = true  
-end
-if Dev_TikToK(msg) == true then  
-PresidentGroup = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-PresidentGroup = true  
-end 
-return PresidentGroup
-end
-function Constructor(msg)
-Constructor = false    
-local hash = redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) 
-if hash then 
-Constructor = true  
-end
-if Dev_TikToK(msg) == true then  
-Constructor = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Constructor = true  
-end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Constructor = true  
-end
-return Constructor
-end
-function Owner(msg)
-Owner = false
-local hash = redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_)    
-if hash then 
-Owner = true  
-end
-if Dev_TikToK(msg) == true then  
-Owner = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Owner = true  
-end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Owner = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-Owner = true  
-end
-return Owner
-end
-function Admin(msg)
-Admiin = false
-local hash = redis:sismember(bot_id..'Admin:Group'..msg.chat_id_,msg.sender_user_id_)    
-if hash then 
-Admiin = true  
-end
-if Dev_TikToK(msg) == true then  
-Admiin = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-Admiin = true  
-end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-Admiin = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-Admiin = true  
-end
-if redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_) then  
-Admiin = true  
-end
-return Admiin 
-end
-function Vips(msg)
-vipss = false 
-local hash = redis:sismember(bot_id..'Vip:Group'..msg.chat_id_,msg.sender_user_id_) 
-if hash then 
-vipss = true  
-end
-if Dev_TikToK(msg) == true then  
-vipss = true  
-end
-if redis:sismember(bot_id.."Developer:Bot", msg.sender_user_id_) then  
-vipss = true  
-end 
-if redis:sismember(bot_id.."President:Group"..msg.chat_id_, msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Constructor:Group'..msg.chat_id_, msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Manager:Group'..msg.chat_id_,msg.sender_user_id_) then  
-vipss = true  
-end
-if redis:sismember(bot_id..'Admin:Group'..msg.chat_id_,msg.sender_user_id_) then       
-vipss = true  
-end 
-if Bot(msg)  == true then       
-vipss = true  
-end 
-return vipss
-end
-------------------------------------------------------------------------------------------------------------
-if msg.chat_id_ then
-local id = tostring(msg.chat_id_)
-if id:match("-100(%d+)") then
-redis:incr(bot_id..'Num:Message:User'..msg.chat_id_..':'..msg.sender_user_id_) 
-TypeForChat = 'ForSuppur' 
-elseif id:match("^(%d+)") then
-redis:sadd(bot_id..'Num:User:Pv',msg.sender_user_id_)  
-TypeForChat = 'ForUser' 
-else
-TypeForChat = 'ForGroup' 
-end
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:Lock:text"..msg.chat_id_) and not Vips(msg) then       
-Delete_Message(msg.chat_id_,{[0] = msg.id_})   
-return false     
-end     
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageChatAddMembers" then 
-redis:incr(bot_id.."Num:Add:Memp"..msg.chat_id_..":"..msg.sender_user_id_) 
-end
-if msg.content_.ID == "MessageChatAddMembers" and not Vips(msg) then   
-if redis:get(bot_id.."Status:Lock:AddMempar"..msg.chat_id_) == "kick" then
-local mem_id = msg.content_.members_  
-for i=0,#mem_id do  
-KickGroup(msg.chat_id_,mem_id[i].id_)
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageChatJoinByLink" and not Vips(msg) then 
-if redis:get(bot_id.."Status:Lock:Join"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-return false  
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.caption_ then 
-if msg.content_.caption_:match("@[%a%d_]+") or msg.content_.caption_:match("@(.+)") then  
-if redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if text and text:match("@[%a%d_]+") or text and text:match("@(.+)") then    
-if redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.caption_ then 
-if msg.content_.caption_:match("#[%a%d_]+") or msg.content_.caption_:match("#(.+)") then 
-if redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if text and text:match("#[%a%d_]+") or text and text:match("#(.+)") then
-if redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.caption_ then 
-if msg.content_.caption_:match("/[%a%d_]+") or msg.content_.caption_:match("/(.+)") then  
-if redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if text and text:match("/[%a%d_]+") or text and text:match("/(.+)") then
-if redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "del" and not Vips(msg) then    
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "ked" and not Vips(msg) then    
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "kick" and not Vips(msg) then    
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) == "ktm" and not Vips(msg) then    
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.caption_ then 
-if not Vips(msg) then 
-if msg.content_.caption_:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]/") or msg.content_.caption_:match("[Hh][Tt][Tt][Pp][Ss]://") or msg.content_.caption_:match("[Hh][Tt][Tt][Pp]://") or msg.content_.caption_:match("[Ww][Ww][Ww].") or msg.content_.caption_:match(".[Cc][Oo][Mm]") or msg.content_.caption_:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Dd][Oo][Gg]/") or msg.content_.caption_:match(".[Pp][Ee]") or msg.content_.caption_:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]/") or msg.content_.caption_:match("[Jj][Oo][Ii][Nn][Cc][Hh][Aa][Tt]/") or msg.content_.caption_:match("[Tt].[Mm][Ee]/") then 
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "del" and not Vips(msg) then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "ked" and not Vips(msg) then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "kick" and not Vips(msg) then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "ktm" and not Vips(msg) then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if text and text:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]/") or text and text:match("[Hh][Tt][Tt][Pp][Ss]://") or text and text:match("[Hh][Tt][Tt][Pp]://") or text and text:match("[Ww][Ww][Ww].") or text and text:match(".[Cc][Oo][Mm]") or text and text:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Dd][Oo][Gg]/") or text and text:match(".[Pp][Ee]") or text and text:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]/") or text and text:match("[Jj][Oo][Ii][Nn][Cc][Hh][Aa][Tt]/") or text and text:match("[Tt].[Mm][Ee]/") and not Vips(msg) then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "del" and not Vips(msg) then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "ked" and not Vips(msg) then 
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "kick" and not Vips(msg) then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) == "ktm" and not Vips(msg) then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessagePhoto" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Photo"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Photo"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Photo"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Photo"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageVideo" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Video"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Video"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Video"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Video"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageAnimation" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Animation"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Animation"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Animation"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Animation"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.game_ and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:geam"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:geam"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:geam"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:geam"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageAudio" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Audio"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Audio"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Audio"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Audio"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageVoice" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:vico"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:vico"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:vico"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:vico"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.reply_markup_ and msg.reply_markup_.ID == "ReplyMarkupInlineKeyboard" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Keyboard"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Keyboard"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Keyboard"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Keyboard"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageSticker" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Sticker"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Sticker"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Sticker"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Sticker"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.forward_info_ and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:forward"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-elseif redis:get(bot_id.."Status:Lock:forward"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-elseif redis:get(bot_id.."Status:Lock:forward"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-elseif redis:get(bot_id.."Status:Lock:forward"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageDocument" and not Vips(msg) then     
-if redis:get(bot_id.."Status:Lock:Document"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Document"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Document"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Document"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageUnsupported" and not Vips(msg) then      
-if redis:get(bot_id.."Status:Lock:Unsupported"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Unsupported"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Unsupported"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Unsupported"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.entities_ then 
-if msg.content_.entities_[0] then 
-if msg.content_.entities_[0] and msg.content_.entities_[0].ID == "MessageEntityUrl" or msg.content_.entities_[0].ID == "MessageEntityTextUrl" then      
-if not Vips(msg) then
-if redis:get(bot_id.."Status:Lock:Markdaun"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Markdaun"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Markdaun"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Markdaun"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end  
-end 
-end
-end 
-
-if tonumber(msg.via_bot_user_id_) ~= 0 and not Vips(msg) then
-if redis:get(bot_id.."Status:Lock:Inlen"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Inlen"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Inlen"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Inlen"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end 
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID == "MessageContact" and not Vips(msg) then      
-if redis:get(bot_id.."Status:Lock:Contact"..msg.chat_id_) == "del" then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Contact"..msg.chat_id_) == "ked" then
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Contact"..msg.chat_id_) == "kick" then
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Contact"..msg.chat_id_) == "ktm" then
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-
---------------------------------------------------------------------------------------------------------------
-if msg.content_.text_ then  
-local _nl, ctrl_ = string.gsub(text, "%c", "")  
-local _nl, real_ = string.gsub(text, "%d", "")   
-sens = 400  
-if redis:get(bot_id.."Status:Lock:Spam"..msg.chat_id_) == "del" and not Vips(msg) and string.len(msg.content_.text_) > (sens) or ctrl_ > (sens) or real_ > (sens) then 
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Spam"..msg.chat_id_) == "ked" and not Vips(msg) and string.len(msg.content_.text_) > (sens) or ctrl_ > (sens) or real_ > (sens) then 
-RestrictChat(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Spam"..msg.chat_id_) == "kick" and not Vips(msg) and string.len(msg.content_.text_) > (sens) or ctrl_ > (sens) or real_ > (sens) then 
-KickGroup(msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-elseif redis:get(bot_id.."Status:Lock:Spam"..msg.chat_id_) == "ktm" and not Vips(msg) and string.len(msg.content_.text_) > (sens) or ctrl_ > (sens) or real_ > (sens) then 
-redis:sadd(bot_id.."Silence:User:Group"..msg.chat_id_,msg.sender_user_id_)
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-end
-end
-if text and redis:get(bot_id..'Status:lock:Fsh'..msg.chat_id_) and not Vips(msg) then
-list = {"كس","كسمك","كسختك","عير","كسخالتك","خرا بالله","عير بالله","كسخواتكم","كحاب","مناويج","مناويج","كحبه","ابن الكحبه","فرخ","فروخ","طيزك","طيزختك"}
-for k,v in pairs(list) do
-if string.find(text,v) ~= nil then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-end
-end
-end
-if text and redis:get(bot_id..'Status:lock:Far'..msg.chat_id_) and not Vips(msg) then
-list = {"ڄ","گ","که","پی","خسته","برم","راحتی","بیام","بپوشم","گرمه","چه","چ","ڬ","ٺ","چ","ڇ","ڿ","ڀ","ڎ","ݫ","ژ","ڟ","ݜ","ڸ","پ","۴","زدن","دخترا","دیوث","مک","زدن"}
-for k,v in pairs(list) do
-if string.find(text,v) ~= nil then
-Delete_Message(msg.chat_id_,{[0] = msg.id_}) 
-return false
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-
-if msg.content_.ID == "MessageChatJoinByLink" then
-if tonumber(msg.sender_user_id_) == tonumber(399545418) then
-send(msg.chat_id_, msg.id_,'هلا حبيبي وتجراسي خالد .')
-return false 
-end
-if redis:get(bot_id.."Status:lock:kanser"..msg.chat_id_) then
-tdcli_function ({ID = "GetUser",user_id_ = msg.sender_user_id_},function(arg,data) 
-local last_ = data.last_name_ or ''
-local first_ = data.first_name_ or ''
-local taha = (first_..''..last_)
-local Num = (redis:get(bot_id..'Num:kansers'..msg.chat_id_) or 25)
-if string.len(taha) > tonumber(Num) then
-send(msg.chat_id_, msg.id_,'\n⌔︙الكانسر مقفول يرجى زغرفه اسمك اولاً\n ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉\n[⌔︙ اضغط هنا لزغرفه اسمك.](https://t.me/SJAIBot)')
-https.request("https://api.telegram.org/bot"..token.."/restrictChatMember?chat_id="..msg.chat_id_.."&user_id="..msg.sender_user_id_)
-end
-end,nil)   
-return false
-end
-local status_welcome = redis:get(bot_id.."Chek:Welcome"..msg.chat_id_)
-if status_welcome and not redis:get(bot_id.."Status:Lock:tagservr"..msg.chat_id_) then
-tdcli_function({ID = "GetUser",user_id_=msg.sender_user_id_},function(extra,result) 
-local GetWelcomeGroup = redis:get(bot_id.."Get:Welcome:Group"..msg.chat_id_)  
-if GetWelcomeGroup then 
-t = GetWelcomeGroup
-else  
-t = "\n• نورت حبي \n•  name \n• user" 
-end 
-t = t:gsub("name",result.first_name_) 
-t = t:gsub("user",("@"..result.username_ or "لا يوجد")) 
-send(msg.chat_id_, msg.id_,t)
-end,nil) 
-end 
-end 
--------------------------------------------------------
-if msg.content_.ID == "MessagePinMessage" then
-if Constructor(msg) or tonumber(msg.sender_user_id_) == tonumber(bot_id) then 
-redis:set(bot_id.."Get:Id:Msg:Pin"..msg.chat_id_,msg.content_.message_id_)
-else
-local Msg_Pin = redis:get(bot_id.."Get:Id:Msg:Pin"..msg.chat_id_)
-if Msg_Pin and redis:get(bot_id.."Status:lockpin"..msg.chat_id_) then
-Pin_Message(msg.chat_id_,Msg_Pin)
-end
-end
-end
---------------------------------------------------------------------------------------------------------------
-if msg.content_.ID ~= "MessageChatAddMembers" and redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Spam:User") and not Vips(msg) then 
-if msg.sender_user_id_ ~= bot_id and not Vips(msg)  then
-floods = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Spam:User") or "nil"
-Num_Msg_Max = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam") or 5
-Time_Spam = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam:Time") or 5
-local post_count = tonumber(redis:get(bot_id.."Spam:Cont"..msg.sender_user_id_..":"..msg.chat_id_) or 0)
-if post_count > tonumber(redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam") or 5) then 
-local ch = msg.chat_id_
-local type = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Spam:User") 
-NotSpam(msg,type)  
-end
-redis:setex(bot_id.."Spam:Cont"..msg.sender_user_id_..":"..msg.chat_id_, tonumber(redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam:Time") or 3), post_count+1) 
-local edit_id = data.text_ or "nil"  
-Num_Msg_Max = 5
-if redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam") then
-Num_Msg_Max = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam") 
-end
-if redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam:Time") then
-Time_Spam = redis:hget(bot_id.."Spam:Group:User"..msg.chat_id_,"Num:Spam:Time") 
-end 
-end
-end 
---------------------------------------------------------------------------------------------------------------
-if msg.content_.photo_ then  
-if redis:get(bot_id.."Set:Chat:Photo"..msg.chat_id_..":"..msg.sender_user_id_) then 
-if msg.content_.photo_.sizes_[3] then  
-photo_id = msg.content_.photo_.sizes_[3].photo_.persistent_id_ 
-else 
-photo_id = msg.content_.photo_.sizes_[0].photo_.persistent_id_ 
-end 
-tdcli_function ({ID = "ChangeChatPhoto",chat_id_ = msg.chat_id_,photo_ = getInputFile(photo_id) }, function(arg,data)   
-if data.code_ == 3 then
-send(msg.chat_id_, msg.id_,"⌔︙عذرا البوت ليس ادمن يرجى ترقيتي والمحاوله لاحقا") 
-redis:del(bot_id.."Set:Chat:Photo"..msg.chat_id_..":"..msg.sender_user_id_) 
-return false  end
-if data.message_ == "CHAT_ADMIN_REQUIRED" then 
-send(msg.chat_id_, msg.id_,"⌔︙ليس لدي صلاحية تغيير معلومات المجموعه يرجى المحاوله لاحقا") 
-redis:del(bot_id.."Set:Chat:Photo"..msg.chat_id_..":"..msg.sender_user_id_) 
-else
-send(msg.chat_id_, msg.id_,"⌔︙تم تغيير صورة المجموعه") 
-end
-end, nil) 
-redis:del(bot_id.."Set:Chat:Photo"..msg.chat_id_..":"..msg.sender_user_id_) 
-end   
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Broadcasting:Groups:Pin" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء الاذاعه للمجموعات") 
-redis:del(bot_id.."Broadcasting:Groups:Pin" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end 
-local list = redis:smembers(bot_id.."ChekBotAdd") 
-send(msg.chat_id_, msg.id_,"⌔︙تمت الاذاعه الى *- "..#list.." * مجموعه في البوت ")     
-if msg.content_.text_ then
-for k,v in pairs(list) do 
-send(v, 0,"["..msg.content_.text_.."]")  
-redis:set(bot_id..'Msg:Pin:Chat'..v,msg.content_.text_) 
-end
-elseif msg.content_.photo_ then
-if msg.content_.photo_.sizes_[0] then
-photo = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-elseif msg.content_.photo_.sizes_[1] then
-photo = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-for k,v in pairs(list) do 
-sendPhoto(v, 0, photo,(msg.content_.caption_ or ""))
-redis:set(bot_id..'Msg:Pin:Chat'..v,photo) 
-end 
-elseif msg.content_.animation_ then
-for k,v in pairs(list) do 
-sendDocument(v, 0, msg.content_.animation_.animation_.persistent_id_,(msg.content_.caption_ or "")) 
-redis:set(bot_id..'Msg:Pin:Chat'..v,msg.content_.animation_.animation_.persistent_id_)
-end 
-elseif msg.content_.sticker_ then
-for k,v in pairs(list) do 
-sendSticker(v, 0, msg.content_.sticker_.sticker_.persistent_id_)   
-redis:set(bot_id..'Msg:Pin:Chat'..v,msg.content_.sticker_.sticker_.persistent_id_) 
-end 
-end
-redis:del(bot_id.."Broadcasting:Groups:Pin" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Broadcasting:Users" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء الاذاعه خاص") 
-redis:del(bot_id.."Broadcasting:Users" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end 
-local list = redis:smembers(bot_id..'Num:User:Pv')  
-send(msg.chat_id_, msg.id_,"⌔︙تمت الاذاعه الى *- "..#list.." * مشترك في البوت ")     
-if msg.content_.text_ then
-for k,v in pairs(list) do 
-send(v, 0,"["..msg.content_.text_.."]")  
-end
-elseif msg.content_.photo_ then
-if msg.content_.photo_.sizes_[0] then
-photo = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-elseif msg.content_.photo_.sizes_[1] then
-photo = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-for k,v in pairs(list) do 
-sendPhoto(v, 0, photo,(msg.content_.caption_ or ""))
-end 
-elseif msg.content_.animation_ then
-for k,v in pairs(list) do 
-sendDocument(v, 0, msg.content_.animation_.animation_.persistent_id_,(msg.content_.caption_ or ""))    
-end 
-elseif msg.content_.sticker_ then
-for k,v in pairs(list) do 
-sendSticker(v, 0, msg.content_.sticker_.sticker_.persistent_id_)   
-end 
-end
-redis:del(bot_id.."Broadcasting:Users" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Broadcasting:Groups" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء الاذاعه للمجموعات") 
-redis:del(bot_id.."Broadcasting:Groups" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end 
-local list = redis:smembers(bot_id.."ChekBotAdd") 
-send(msg.chat_id_, msg.id_,"⌔︙تمت الاذاعه الى *- "..#list.." * مجموعه في البوت ")     
-if msg.content_.text_ then
-for k,v in pairs(list) do 
-send(v, 0,"["..msg.content_.text_.."]")  
-end
-elseif msg.content_.photo_ then
-if msg.content_.photo_.sizes_[0] then
-photo = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-elseif msg.content_.photo_.sizes_[1] then
-photo = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-for k,v in pairs(list) do 
-sendPhoto(v, 0, photo,(msg.content_.caption_ or ""))
-end 
-elseif msg.content_.animation_ then
-for k,v in pairs(list) do 
-sendDocument(v, 0, msg.content_.animation_.animation_.persistent_id_,(msg.content_.caption_ or ""))    
-end 
-elseif msg.content_.sticker_ then
-for k,v in pairs(list) do 
-sendSticker(v, 0, msg.content_.sticker_.sticker_.persistent_id_)   
-end 
-end
-redis:del(bot_id.."Broadcasting:Groups" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Broadcasting:Groups:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء الاذاعه بالتوجيه للمجموعات") 
-redis:del(bot_id.."Broadcasting:Groups:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false  
-end 
-if msg.forward_info_ then 
-local list = redis:smembers(bot_id.."ChekBotAdd")   
-send(msg.chat_id_, msg.id_,"⌔︙تم التوجيه الى *- "..#list.." * مجموعه في البوت ")     
-for k,v in pairs(list) do  
-tdcli_function({ID="ForwardMessages",
-chat_id_ = v,
-from_chat_id_ = msg.chat_id_,
-message_ids_ = {[0] = msg.id_},
-disable_notification_ = 0,
-from_background_ = 1},function(a,t) end,nil) 
-end   
-redis:del(bot_id.."Broadcasting:Groups:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-end 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Broadcasting:Users:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء الاذاعه بالترجيه خاص") 
-redis:del(bot_id.."Broadcasting:Users:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-return false  
-end 
-if msg.forward_info_ then 
-local list = redis:smembers(bot_id.."Num:User:Pv")   
-send(msg.chat_id_, msg.id_,"⌔︙تم التوجيه الى *- "..#list.." * مجموعه في البوت ")     
-for k,v in pairs(list) do  
-tdcli_function({ID="ForwardMessages",
-chat_id_ = v,
-from_chat_id_ = msg.chat_id_,
-message_ids_ = {[0] = msg.id_},
-disable_notification_ = 0,
-from_background_ = 1},function(a,t) end,nil) 
-end   
-redis:del(bot_id.."Broadcasting:Users:Fwd" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) 
-end 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Change:Description" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then  
-if text == "الغاء" then 
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر تغير وصف المجموعه") 
-redis:del(bot_id.."Change:Description" .. msg.chat_id_ .. "" .. msg.sender_user_id_)
-return false  
-end 
-redis:del(bot_id.."Change:Description" .. msg.chat_id_ .. "" .. msg.sender_user_id_)   
-https.request("https://api.telegram.org/bot"..token.."/setChatDescription?chat_id="..msg.chat_id_.."&description="..text) 
-send(msg.chat_id_, msg.id_,"⌔︙تم تغيير وصف المجموعه")   
-return false  
-end 
---------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Welcome:Group" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then 
-if text == "الغاء" then 
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر حفظ الترحيب") 
-redis:del(bot_id.."Welcome:Group" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-return false  
-end 
-redis:del(bot_id.."Welcome:Group" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-redis:set(bot_id.."Get:Welcome:Group"..msg.chat_id_,text) 
-send(msg.chat_id_, msg.id_,"⌔︙تم حفظ ترحيب المجموعه")   
-return false   
-end
---------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:link:set"..msg.chat_id_..""..msg.sender_user_id_) then
-if text == "الغاء" then
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر حفظ الرابط") 
-redis:del(bot_id.."Status:link:set"..msg.chat_id_..""..msg.sender_user_id_) 
-return false
-end
-if text and text:match("(https://telegram.me/joinchat/%S+)") or text and text:match("(https://t.me/joinchat/%S+)") then     
-local Link = text:match("(https://telegram.me/joinchat/%S+)") or text:match("(https://t.me/joinchat/%S+)")   
-redis:set(bot_id.."Status:link:set:Group"..msg.chat_id_,Link)
-send(msg.chat_id_,msg.id_,"⌔︙تم حفظ الرابط بنجاح")       
-redis:del(bot_id.."Status:link:set"..msg.chat_id_..""..msg.sender_user_id_) 
-return false 
-end
-end 
-------------------------------------------------------------------------------------------------------------
-if text and not Vips(msg) then  
-local Text_Filter = redis:get(bot_id.."Filter:Reply2"..text..msg.chat_id_)   
-if Text_Filter then    
-Send_Options(msg,msg.sender_user_id_,"reply","⌔︙"..Text_Filter)  
-Delete_Message(msg.chat_id_, {[0] = msg.id_})     
-return false
-end
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Change:Name:Bot"..msg.sender_user_id_) then 
-if text == "الغاء" or text == "الغاء ✖" then   
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر تغير اسم البوت") 
-redis:del(bot_id.."Change:Name:Bot"..msg.sender_user_id_) 
-return false  
-end 
-redis:del(bot_id.."Change:Name:Bot"..msg.sender_user_id_) 
-redis:set(bot_id.."Redis:Name:Bot",text) 
-Name_Bot = text
-send(msg.chat_id_, msg.id_, "⌔︙ تم تغير اسم البوت الى - "..text)  
-return false
-end 
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Redis:Validity:Group"..msg.chat_id_..""..msg.sender_user_id_) then 
-if text and text:match("^الغاء$") then 
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر اضافة صلاحيه") 
-local CmdDel = redis:get(bot_id.."Add:Validity:Group:Rt:New"..msg.chat_id_..msg.sender_user_id_)  
-redis:del(bot_id.."Add:Validity:Group:Rt"..CmdDel..msg.chat_id_)
-redis:srem(bot_id.."Validitys:Group"..msg.chat_id_,CmdDel)  
-redis:del(bot_id.."Redis:Validity:Group"..msg.chat_id_..""..msg.sender_user_id_) 
-return false  
-end 
-
-if text == "مدير" or text == "ادمن" or text == "مميز" or text == "عضو" then
-local textn = redis:get(bot_id.."Add:Validity:Group:Rt:New"..msg.chat_id_..msg.sender_user_id_)  
-redis:set(bot_id.."Add:Validity:Group:Rt"..textn..msg.chat_id_,text)
-send(msg.chat_id_, msg.id_, "\n⌔︙تم اضافة الصلاحيه باسم ← { "..textn..' }') 
-redis:del(bot_id.."Redis:Validity:Group"..msg.chat_id_..""..msg.sender_user_id_) 
-return false  
-end 
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Redis:Id:Group"..msg.chat_id_..""..msg.sender_user_id_) then 
-if text == 'الغاء' then 
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر تعين الايدي") 
-redis:del(bot_id.."Redis:Id:Group"..msg.chat_id_..""..msg.sender_user_id_) 
-return false  
-end 
-redis:del(bot_id.."Redis:Id:Group"..msg.chat_id_..""..msg.sender_user_id_) 
-redis:set(bot_id.."Set:Id:Group"..msg.chat_id_,text:match("(.*)"))
-send(msg.chat_id_, msg.id_,'⌔︙تم تعين الايدي الجديد')    
-end
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Random:Sm"..msg.chat_id_) or "").."" and not redis:get(bot_id.."Status:Set:Sma"..msg.chat_id_) then
-if not redis:get(bot_id.."Status:Set:Sma"..msg.chat_id_) then 
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - سمايل او سمايلات")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Sma"..msg.chat_id_,true)
-return false
-end 
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Klam:Speed"..msg.chat_id_) or "").."" and not redis:get(bot_id.."Status:Speed:Tr"..msg.chat_id_) then
-if not redis:get(bot_id.."Status:Speed:Tr"..msg.chat_id_) then 
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - الاسرع او ترتيب")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Speed:Tr"..msg.chat_id_,true)
-end 
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Klam:Hzor"..msg.chat_id_) or "").."" and not redis:get(bot_id.."Status:Set:Hzora"..msg.chat_id_) then
-if not redis:get(bot_id.."Status:Set:Hzora"..msg.chat_id_) then 
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - حزوره")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Hzora"..msg.chat_id_,true)
-end 
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Maany"..msg.chat_id_) or "").."" and not redis:get(bot_id.."Status:Set:Maany"..msg.chat_id_) then
-if not redis:get(bot_id.."Status:Set:Maany"..msg.chat_id_) then 
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - معاني")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Maany"..msg.chat_id_,true)
-end 
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Set:Aks:Game"..msg.chat_id_) or "").."" and not redis:get(bot_id.."Status:Set:Aks"..msg.chat_id_) then
-if not redis:get(bot_id.."Status:Set:Aks"..msg.chat_id_) then 
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - العكس")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Aks"..msg.chat_id_,true)
-end 
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:GAME:TKMEN" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then  
-if text and text:match("^(%d+)$") then
-local NUM = text:match("^(%d+)$")
-if tonumber(NUM) > 20 then
-send(msg.chat_id_, msg.id_,"⌔︙عذرآ لا يمكنك تخمين عدد اكبر من ال { 20 } خمن رقم ما بين ال{ 1 و 20 }\n")
-return false  end 
-local GETNUM = redis:get(bot_id.."Status:GAMES:NUM"..msg.chat_id_)
-if tonumber(NUM) == tonumber(GETNUM) then
-redis:del(bot_id.."Status:SADD:NUM"..msg.chat_id_..msg.sender_user_id_)
-redis:del(bot_id.."Status:GAME:TKMEN" .. msg.chat_id_ .. "" .. msg.sender_user_id_)   
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_,5)  
-send(msg.chat_id_, msg.id_,"⌔︙مبروك فزت ويانه وخمنت الرقم الصحيح\n⌔︙تم اضافة { 5 } من النقاط \n")
-elseif tonumber(NUM) ~= tonumber(GETNUM) then
-redis:incrby(bot_id.."Status:SADD:NUM"..msg.chat_id_..msg.sender_user_id_,1)
-if tonumber(redis:get(bot_id.."Status:SADD:NUM"..msg.chat_id_..msg.sender_user_id_)) >= 3 then
-redis:del(bot_id.."Status:SADD:NUM"..msg.chat_id_..msg.sender_user_id_)
-redis:del(bot_id.."Status:GAME:TKMEN" .. msg.chat_id_ .. "" .. msg.sender_user_id_)   
-send(msg.chat_id_, msg.id_,"⌔︙اوبس لقد خسرت في اللعبه \n⌔︙حظآ اوفر في المره القادمه \n⌔︙كان الرقم الذي تم تخمينه { "..GETNUM.." }")
-else
-send(msg.chat_id_, msg.id_,"⌔︙اوبس تخمينك غلط \n⌔︙ارسل رقم تخمنه مره اخرى ")
-end
-end
-end
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:SET:GAME" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then  
-if text and text:match("^(%d+)$") then
-local NUM = text:match("^(%d+)$")
-if tonumber(NUM) > 6 then
-send(msg.chat_id_, msg.id_,"⌔︙عذرا لا يوجد سواء { 6 } اختيارات فقط ارسل اختيارك مره اخرى\n")
-return false  end 
-local GETNUM = redis:get(bot_id.."Status:Games:Bat"..msg.chat_id_)
-if tonumber(NUM) == tonumber(GETNUM) then
-redis:del(bot_id.."Status:SET:GAME" .. msg.chat_id_ .. "" .. msg.sender_user_id_)   
-send(msg.chat_id_, msg.id_,"⌔︙مبروك فزت وطلعت المحيبس بل ايد رقم { "..NUM.." }\n⌔︙لقد حصلت على { 3 }من نقاط يمكنك استبدالهن برسائل ")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_,3)  
-elseif tonumber(NUM) ~= tonumber(GETNUM) then
-redis:del(bot_id.."Status:SET:GAME" .. msg.chat_id_ .. "" .. msg.sender_user_id_)   
-send(msg.chat_id_, msg.id_,"⌔︙للاسف لقد خسرت \n⌔︙المحيبس بل ايد رقم { "..GETNUM.." }\n⌔︙حاول مره اخرى للعثور على المحيبس")
-end
-end
-end
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status::Set:Moktlf"..msg.chat_id_) or "").."" then 
-if not redis:get(bot_id.."Status:Set:Moktlf:Bot"..msg.chat_id_) then 
-redis:del(bot_id.."Status::Set:Moktlf"..msg.chat_id_)
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - المختلف")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Moktlf:Bot"..msg.chat_id_,true)
-end
-------------------------------------------------------------------------------------------------------------
-if text == ""..(redis:get(bot_id.."Status:Set:Amth"..msg.chat_id_) or "").."" then 
-if not redis:get(bot_id.."Status:Set:Amth:Bot"..msg.chat_id_) then 
-redis:del(bot_id.."Status:Set:Amth"..msg.chat_id_)
-send(msg.chat_id_, msg.id_,"\n⌔︙لقد فزت في اللعبه \n⌔︙اللعب مره اخره وارسل - امثله")
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..msg.sender_user_id_, 1)  
-end
-redis:set(bot_id.."Status:Set:Amth:Bot"..msg.chat_id_,true)
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:Add:msg:user" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then 
-if text and text:match("^الغاء$") then 
-redis:del(bot_id.."id:user"..msg.chat_id_)  
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر اضافة رسائل") 
-redis:del(bot_id.."Status:Add:msg:user" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-return false  
-end 
-redis:del(bot_id.."Status:Add:msg:user" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-local numadded = string.match(text, "(%d+)") 
-local iduserr = redis:get(bot_id.."id:user"..msg.chat_id_)  
-redis:del(bot_id.."Msg_User"..msg.chat_id_..":"..msg.sender_user_id_) 
-redis:incrby(bot_id.."Num:Message:Userr"..msg.chat_id_..":"..iduserr,numadded)  
-send(msg.chat_id_,msg.id_,"\n⌔︙تم اضافة له - "..numadded.." رسائل")  
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Status:games:add" .. msg.chat_id_ .. "" .. msg.sender_user_id_) then 
-if text and text:match("^الغاء$") then 
-redis:del(bot_id.."idgem:user"..msg.chat_id_)  
-send(msg.chat_id_,msg.id_, "\n⌔︙تم الغاء امر اضافة جواهر") 
-redis:del(bot_id.."Status:games:add" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-return false  
-end 
-redis:del(bot_id.."Status:games:add" .. msg.chat_id_ .. "" .. msg.sender_user_id_)  
-local numadded = string.match(text, "(%d+)") 
-local iduserr = redis:get(bot_id.."idgem:user"..msg.chat_id_)  
-redis:incrby(bot_id.."Num:Add:Games"..msg.chat_id_..iduserr,numadded)  
-send(msg.chat_id_,msg.id_,"\n⌔︙تم اضافة له - "..numadded.." مجوهرات")  
-end
-------------------------------------------------------------------------------------------------------------
-if redis:get(bot_id.."Redis:Rules:" .. msg.chat_id_ .. ":" .. msg.sender_user_id_) then 
-if text == "الغاء" then 
-send(msg.chat_id_, msg.id_, "⌔︙تم الغاء حفظ القوانين") 
-redis:del(bot_id.."Redis:Rules:" .. msg.chat_id_ .. ":" .. msg.sender_user_id_)
-return false  
-end 
-redis:set(bot_id..":Rules:Group" .. msg.chat_id_,text) 
-send(msg.chat_id_, msg.id_,"⌔︙تم حفظ قوانين المجموعه") 
-redis:del(bot_id.."Redis:Rules:" .. msg.chat_id_ .. ":" .. msg.sender_user_id_)
-end  
-------------------------------------------------------------------------------------------------------------
-if text then 
-local DelFilter = redis:get(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_)  
-if DelFilter and DelFilter == "DelFilter" then   
-send(msg.chat_id_, msg.id_,"⌔︙تم الغاء منعها ")  
-redis:del(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_)  
-redis:del(bot_id.."Filter:Reply2"..text..msg.chat_id_)  
-redis:srem(bot_id.."List:Filter"..msg.chat_id_,text)  
-return false  end  
-end
-------------------------------------------------------------------------------------------------------------
-if text then   
-local SetFilter = redis:get(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_)  
-if SetFilter and SetFilter == "SetFilter" then   
-send(msg.chat_id_, msg.id_,"⌔︙ارسل التحذير عند ارسال الكلمه")  
-redis:set(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_,"WirngFilter")  
-redis:set(bot_id.."Filter:Reply:Status"..msg.sender_user_id_..msg.chat_id_, text)  
-redis:sadd(bot_id.."List:Filter"..msg.chat_id_,text)  
-return false  
-end  
-end
-------------------------------------------------------------------------------------------------------------
-if text then  
-local WirngFilter = redis:get(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_)  
-if WirngFilter and WirngFilter == "WirngFilter" then  
-send(msg.chat_id_, msg.id_,"⌔︙تم منع الكلمه مع التحذير")  
-redis:del(bot_id.."Filter:Reply1"..msg.sender_user_id_..msg.chat_id_)  
-local test = redis:get(bot_id.."Filter:Reply:Status"..msg.sender_user_id_..msg.chat_id_)  
-if text then   
-redis:set(bot_id.."Filter:Reply2"..test..msg.chat_id_, text)  
-end  
-redis:del(bot_id.."Filter:Reply:Status"..msg.sender_user_id_..msg.chat_id_)  
-return false  end  
-end
-------------------------------------------------------------------------------------------------------------
-if text and redis:get(bot_id..'GetTexting:DevTikToK'..msg.chat_id_..':'..msg.sender_user_id_) then
-if text == 'الغاء' or text == 'الغاء ✖' then 
-redis:del(bot_id..'GetTexting:DevTikToK'..msg.chat_id_..':'..msg.sender_user_id_)
-send(msg.chat_id_,msg.id_,'⌔︙تم الغاء حفظ كليشة المطور')
-return false
-end
-redis:set(bot_id..'Texting:DevTikToK',text)
-redis:del(bot_id..'GetTexting:DevTikToK'..msg.chat_id_..':'..msg.sender_user_id_)
-send(msg.chat_id_,msg.id_,'⌔︙تم حفظ كليشة المطور')
-send(msg.chat_id_,msg.id_,text)
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if text or msg.content_.sticker_ or msg.content_.voice_ or msg.content_.animation_ or msg.content_.audio_ or msg.content_.document_ or msg.content_.photo_ or msg.content_.video_ then  
-local test = redis:get(bot_id.."Text:Manager"..msg.sender_user_id_..":"..msg.chat_id_.."")
-if redis:get(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_) == "true1" then
-redis:del(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_)
-if msg.content_.sticker_ then   
-redis:set(bot_id.."Add:Rd:Manager:Stekrs"..test..msg.chat_id_, msg.content_.sticker_.sticker_.persistent_id_)  
-end   
-if msg.content_.voice_ then  
-redis:set(bot_id.."Add:Rd:Manager:Vico"..test..msg.chat_id_, msg.content_.voice_.voice_.persistent_id_)  
-end   
-if msg.content_.animation_ then   
-redis:set(bot_id.."Add:Rd:Manager:Gif"..test..msg.chat_id_, msg.content_.animation_.animation_.persistent_id_)  
-end  
-if text then   
-text = text:gsub('"',"") 
-text = text:gsub('"',"") 
-text = text:gsub("`","") 
-text = text:gsub("*","") 
-redis:set(bot_id.."Add:Rd:Manager:Text"..test..msg.chat_id_, text)  
-end  
-if msg.content_.audio_ then
-redis:set(bot_id.."Add:Rd:Manager:Audio"..test..msg.chat_id_, msg.content_.audio_.audio_.persistent_id_)  
-end
-if msg.content_.document_ then
-redis:set(bot_id.."Add:Rd:Manager:File"..test..msg.chat_id_, msg.content_.document_.document_.persistent_id_)  
-end
-if msg.content_.video_ then
-redis:set(bot_id.."Add:Rd:Manager:Video"..test..msg.chat_id_, msg.content_.video_.video_.persistent_id_)  
-end
-if msg.content_.photo_ then
-if msg.content_.photo_.sizes_[0] then
-photo_in_group = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[1] then
-photo_in_group = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[2] then
-photo_in_group = msg.content_.photo_.sizes_[2].photo_.persistent_id_
-end	
-if msg.content_.photo_.sizes_[3] then
-photo_in_group = msg.content_.photo_.sizes_[3].photo_.persistent_id_
-end
-redis:set(bot_id.."Add:Rd:Manager:Photo"..test..msg.chat_id_, photo_in_group)  
-end
-send(msg.chat_id_, msg.id_,"⌔︙تم حفظ رد للمدير بنجاح \n⌔︙ارسل ( "..test.." ) لرئية الرد")
-return false  
-end  
-end
-------------------------------------------------------------------------------------------------------------
-if text and text:match("^(.*)$") then
-if redis:get(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_) == "true" then
-send(msg.chat_id_, msg.id_, '\n⌔︙ارسل لي الرد لاضافته\n⌔︙تستطيع اضافة ← { ملف ، فديو ، نص ، ملصق ، بصمه ، متحركه }\n⌔︙تستطيع ايضا اضافة :\n⌔︙`#username` » معرف المستخدم \n⌔︙`#msgs` » عدد الرسائل\n⌔︙`#name` » اسم المستخدم\n⌔︙`#id` » ايدي المستخدم\n⌔︙`#stast` » موقع المستخدم \n⌔︙`#edit` » عدد السحكات ')
-redis:set(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_,"true1")
-redis:set(bot_id.."Text:Manager"..msg.sender_user_id_..":"..msg.chat_id_, text)
-redis:del(bot_id.."Add:Rd:Manager:Gif"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Vico"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Stekrs"..text..msg.chat_id_)     
-redis:del(bot_id.."Add:Rd:Manager:Text"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Photo"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:Video"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:File"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:Audio"..text..msg.chat_id_)
-redis:sadd(bot_id.."List:Manager"..msg.chat_id_.."", text)
-return false end
-end
-------------------------------------------------------------------------------------------------------------
-if text and text:match("^(.*)$") then
-if redis:get(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_.."") == "true2" then
-send(msg.chat_id_, msg.id_,"⌔︙تم حذف الرد من ردود المدير ")
-redis:del(bot_id.."Add:Rd:Manager:Gif"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Vico"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Stekrs"..text..msg.chat_id_)     
-redis:del(bot_id.."Add:Rd:Manager:Text"..text..msg.chat_id_)   
-redis:del(bot_id.."Add:Rd:Manager:Photo"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:Video"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:File"..text..msg.chat_id_)
-redis:del(bot_id.."Add:Rd:Manager:Audio"..text..msg.chat_id_)
-redis:del(bot_id.."Set:Manager:rd"..msg.sender_user_id_..":"..msg.chat_id_)
-redis:srem(bot_id.."List:Manager"..msg.chat_id_.."", text)
-return false
-end
-end
-------------------------------------------------------------------------------------------------------------
-if text and not redis:get(bot_id.."Status:Reply:Manager"..msg.chat_id_) then
-if not redis:sismember(bot_id..'Spam_For_Bot'..msg.sender_user_id_,text) then
-local anemi = redis:get(bot_id.."Add:Rd:Manager:Gif"..text..msg.chat_id_)   
-local veico = redis:get(bot_id.."Add:Rd:Manager:Vico"..text..msg.chat_id_)   
-local stekr = redis:get(bot_id.."Add:Rd:Manager:Stekrs"..text..msg.chat_id_)     
-local Text = redis:get(bot_id.."Add:Rd:Manager:Text"..text..msg.chat_id_)   
-local photo = redis:get(bot_id.."Add:Rd:Manager:Photo"..text..msg.chat_id_)
-local video = redis:get(bot_id.."Add:Rd:Manager:Video"..text..msg.chat_id_)
-local document = redis:get(bot_id.."Add:Rd:Manager:File"..text..msg.chat_id_)
-local audio = redis:get(bot_id.."Add:Rd:Manager:Audio"..text..msg.chat_id_)
-if Text then 
-tdcli_function({ID="GetUser",user_id_=msg.sender_user_id_},function(arg,data)
-local NumMsgg = redis:get(bot_id..'Num:Message:Userr'..msg.chat_id_..':'..msg.sender_user_id_) or 0
-local NumMsg =( redis:get(bot_id..'Num:Message:User'..msg.chat_id_..':'..msg.sender_user_id_) or 0 + NumMsgg)
-local TotalMsg = Total_message(NumMsg)
-local Status_Gps = Get_Rank(msg.sender_user_id_,msg.chat_id_)
-local NumMessageEdit = redis:get(bot_id..'Num:Message:Edit'..msg.chat_id_..msg.sender_user_id_) or 0
-local Text = Text:gsub('#username',(data.username_ or 'لا يوجد')) 
-local Text = Text:gsub('#name',data.first_name_)
-local Text = Text:gsub('#id',msg.sender_user_id_)
-local Text = Text:gsub('#edit',NumMessageEdit)
-local Text = Text:gsub('#msgs',NumMsg)
-local Text = Text:gsub('#stast',Status_Gps)
-send(msg.chat_id_, msg.id_,'['..Text..']')
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end,nil)
-end
-if stekr then 
-sendSticker(msg.chat_id_,msg.id_,stekr)
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if veico then 
-sendVoice(msg.chat_id_, msg.id_,veico,"")
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if video then 
-sendVideo(msg.chat_id_, msg.id_,video,"")
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if anemi then 
-sendAnimation(msg.chat_id_, msg.id_,anemi,"")   
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if document then
-sendDocument(msg.chat_id_, msg.id_, document)   
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end  
-if audio then
-sendAudio(msg.chat_id_,msg.id_,audio)  
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if photo then
-sendPhoto(msg.chat_id_,msg.id_,photo,photo_caption)
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end  
-end
-end
-------------------------------------------------------------------------------------------------------------
-if text or msg.content_.sticker_ or msg.content_.voice_ or msg.content_.animation_ or msg.content_.audio_ or msg.content_.document_ or msg.content_.photo_ or msg.content_.video_ then  
-local test = redis:get(bot_id.."Text:Sudo:Bot"..msg.sender_user_id_..":"..msg.chat_id_)
-if redis:get(bot_id.."Set:Rd"..msg.sender_user_id_..":"..msg.chat_id_) == "true1" then
-redis:del(bot_id.."Set:Rd"..msg.sender_user_id_..":"..msg.chat_id_)
-if msg.content_.sticker_ then   
-redis:set(bot_id.."Add:Rd:Sudo:stekr"..test, msg.content_.sticker_.sticker_.persistent_id_)  
-end   
-if msg.content_.voice_ then  
-redis:set(bot_id.."Add:Rd:Sudo:vico"..test, msg.content_.voice_.voice_.persistent_id_)  
-end   
-if msg.content_.animation_ then   
-redis:set(bot_id.."Add:Rd:Sudo:Gif"..test, msg.content_.animation_.animation_.persistent_id_)  
-end  
-if text then   
-text = text:gsub('"',"") 
-text = text:gsub('"',"") 
-text = text:gsub("`","") 
-text = text:gsub("*","") 
-redis:set(bot_id.."Add:Rd:Sudo:Text"..test, text)  
-end  
-if msg.content_.audio_ then
-redis:set(bot_id.."Add:Rd:Sudo:Audio"..test, msg.content_.audio_.audio_.persistent_id_)  
-end
-if msg.content_.document_ then
-redis:set(bot_id.."Add:Rd:Sudo:File"..test, msg.content_.document_.document_.persistent_id_)  
-end
-if msg.content_.video_ then
-redis:set(bot_id.."Add:Rd:Sudo:Video"..test, msg.content_.video_.video_.persistent_id_)  
-end
-if msg.content_.photo_ then
-if msg.content_.photo_.sizes_[0] then
-photo_in_group = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[1] then
-photo_in_group = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[2] then
-photo_in_group = msg.content_.photo_.sizes_[2].photo_.persistent_id_
-end	
-if msg.content_.photo_.sizes_[3] then
-photo_in_group = msg.content_.photo_.sizes_[3].photo_.persistent_id_
-end
-redis:set(bot_id.."Add:Rd:Sudo:Photo"..test, photo_in_group)  
-end
-send(msg.chat_id_, msg.id_,"⌔︙تم حفظ رد للمطور \n⌔︙ارسل ( "..test.." ) لرئية الرد")
-return false  
-end  
-end
-------------------------------------------------------------------------------------------------------------
-if text and text:match("^(.*)$") then
-if redis:get(bot_id.."Set:Rd"..msg.sender_user_id_..":"..msg.chat_id_) == "true" then
-send(msg.chat_id_, msg.id_, '\n⌔︙ارسل لي الكلمه الان \n⌔︙تستطيع اضافة ← { ملف ، فديو ، نص ، ملصق ، بصمه ، متحركه }\n⌔︙تستطيع ايضا اضافة :\n⌔︙`#username` » معرف المستخدم \n⌔︙`#msgs` » عدد الرسائل\n⌔︙`#name` » اسم المستخدم\n⌔︙`#id` » ايدي المستخدم\n⌔︙`#stast` » موقع المستخدم \n⌔︙`#edit` » عدد السحكات ')
-redis:set(bot_id.."Set:Rd"..msg.sender_user_id_..":"..msg.chat_id_, "true1")
-redis:set(bot_id.."Text:Sudo:Bot"..msg.sender_user_id_..":"..msg.chat_id_, text)
-redis:sadd(bot_id.."List:Rd:Sudo", text)
-return false end
-end
-------------------------------------------------------------------------------------------------------------
-if text and text:match("^(.*)$") then
-if redis:get(bot_id.."Set:On"..msg.sender_user_id_..":"..msg.chat_id_) == "true" then
-send(msg.chat_id_, msg.id_,"⌔︙تم حذف الرد من ردود المطور")
-list = {"Add:Rd:Sudo:Audio","Add:Rd:Sudo:File","Add:Rd:Sudo:Video","Add:Rd:Sudo:Photo","Add:Rd:Sudo:Text","Add:Rd:Sudo:stekr","Add:Rd:Sudo:vico","Add:Rd:Sudo:Gif"}
-for k,v in pairs(list) do
-redis:del(bot_id..''..v..text)
-end
-redis:del(bot_id.."Set:On"..msg.sender_user_id_..":"..msg.chat_id_)
-redis:srem(bot_id.."List:Rd:Sudo", text)
-return false
-end
-end
-if Dev_TikToK(msg) then
-if text == 'نقل الاحصائيات' then
-local Users = redis:smembers(bot_id.."TikToK:UsersBot")
-local Groups = redis:smembers(bot_id..'TikToK:Chek:Groups') 
-for i = 1, #Groups do
-redis:sadd(bot_id..'ChekBotAdd',Groups[i])  
-local list1 = redis:smembers(bot_id..'TikToK:Basic:Constructor'..Groups[i])
-for k,v in pairs(list1) do
-redis:sadd(bot_id.."President:Group"..Groups[i], v)
-end
-local list2 = redis:smembers(bot_id..'TikToK:Constructor'..Groups[i])
-for k,v in pairs(list2) do
-redis:sadd(bot_id.."Constructor:Group"..Groups[i], v)
-end
-local list3 = redis:smembers(bot_id..'TikToK:Manager'..Groups[i])
-for k,v in pairs(list3) do
-redis:sadd(bot_id.."Manager:Group"..Groups[i], v)
-end
-local list4 = redis:smembers(bot_id..'TikToK:Mod:User'..Groups[i])
-for k,v in pairs(list4) do
-redis:sadd(bot_id.."Admin:Group"..Groups[i], v)
-end
-redis:set(bot_id.."Status:Lock:tagservrbot"..Groups[i],true)   
-list ={"Status:Lock:Bot:kick","Status:Lock:User:Name","Status:Lock:hashtak","Status:Lock:Cmd","Status:Lock:Link","Status:Lock:forward","Status:Lock:Keyboard","Status:Lock:geam","Status:Lock:Photo","Status:Lock:Animation","Status:Lock:Video","Status:Lock:Audio","Status:Lock:vico","Status:Lock:Sticker","Status:Lock:Document","Status:Lock:Unsupported","Status:Lock:Markdaun","Status:Lock:Contact","Status:Status:Lock:Spam"}
-for i,lock in pairs(list) do
-redis:set(bot_id..lock..Groups[i],"del")
-end
-end
-for i = 1, #Users do
-redis:sadd(bot_id..'Num:User:Pv',Users[i])  
-end
-send(msg.chat_id_, msg.id_,'👥┇تم نقل : '..#Groups..' كروب\n👤┇تم نقل : '..#Users..' مشترك \n🔘┇من التحديث القديم الى التحديث الجديد')
-
-elseif text == "تحديث الملفات 🔁" then
-dofile("TikToK.lua")  
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث ملفات البوت")
-elseif text == "تحديث" then
-dofile("TikToK.lua")  
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث ملفات البوت")
-elseif text == 'تحديث السورس 🔂' then
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/TikToK.lua','TikToK.lua') 
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/Script.lua','Script.lua') 
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
-elseif text == 'تحديث السورس' then
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/TikToK.lua','TikToK.lua') 
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/Script.lua','Script.lua') 
-send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
-end
-if text == 'الملفات' then
-Files = '\n⌔︙الملفات المفعله في البوت : \n ━━━━━━━━━━━━━\n'
-i = 0
-for v in io.popen('ls Files'):lines() do
-if v:match(".lua$") then
-i = i + 1
-Files = Files..'*'..i..': * `'..v..'`\n'
-end
-end
-if i == 0 then
-Files = '⌔︙ لا توجد ملفات في البوت '
-end
-send(msg.chat_id_, msg.id_,Files)
-elseif text == "متجر الملفات" or text == 'المتجر' then
-local Get_Files, res = https.request("https://raw.githubusercontent.com/BotTikToK/Files_TikToK/master/getfile.json")
-if res == 200 then
-local Get_info, res = pcall(JSON.decode,Get_Files);
-if Get_info then
-local TextS = "\n⌔︙قائمه ملفات متجر سورس TikToK\n⌔︙الملفات المتوفره حاليا\n━━━━━━━━━━━━━\n\n"
-local TextE = "\n━━━━━━━━━━━━━\n⌔︙علامة ← {✔} تعني الملف مفعل\n⌔︙علامة ← {❌} تعني الملف معطل\n"
-local NumFile = 0
-for name,Info in pairs(res.plugins_) do
-local Check_File_is_Found = io.open("Files/"..name,"r")
-if Check_File_is_Found then
-io.close(Check_File_is_Found)
-CeckFile = "{✔}"
-else
-CeckFile = "{✖}"
-end
-NumFile = NumFile + 1
-TextS = TextS..'*'..NumFile.." : * `"..name..'` → '..CeckFile..'\n[- اضغط لرئية معلومات الملف]('..Info..')\n'
-end
-send(msg.chat_id_, msg.id_,TextS..TextE) 
-end
-else
-send(msg.chat_id_, msg.id_,"⌔︙ لا يوجد اتصال من ال api") 
-end
-elseif text == "مسح جميع الملفات" then
-os.execute("rm -fr Files/*")
-send(msg.chat_id_,msg.id_,"⌔︙تم مسح جميع ملفات المفعله")
-elseif text and text:match("^(تعطيل ملف) (.*)(.lua)$") then
-local File_Get = {string.match(text, "^(تعطيل ملف) (.*)(.lua)$")}
-local File_Name = File_Get[2]..'.lua'
-local Get_Json, Res = https.request("https://raw.githubusercontent.com/BotTikToK/Files_TikToK/master/Files_TikToK/"..File_Name)
-if Res == 200 then
-os.execute("rm -fr Files/"..File_Name)
-send(msg.chat_id_, msg.id_,"\n⌔︙الملف ← *"..File_Name.."*\n⌔︙تم تعطيله وحذفه من البوت بنجاح") 
-dofile('TikToK.lua')  
-else
-send(msg.chat_id_, msg.id_,"⌔︙لا يوجد ملف بهاذا الاسم") 
-end
-elseif text and text:match("^(تفعيل ملف) (.*)(.lua)$") then
-local File_Get = {string.match(text, "^(تفعيل ملف) (.*)(.lua)$")}
-local File_Name = File_Get[2]..'.lua'
-local Get_Json, Res = https.request("https://raw.githubusercontent.com/BotTikToK/Files_TikToK/master/Files_TikToK/"..File_Name)
-if Res == 200 then
-local ChekAuto = io.open("Files/"..File_Name,'w+')
-ChekAuto:write(Get_Json)
-ChekAuto:close()
-send(msg.chat_id_, msg.id_,"\n⌔︙الملف ← *"..File_Name.."*\n⌔︙تم تفعيله في البوت بنجاح") 
-dofile('TikToK.lua')  
-else
-send(msg.chat_id_, msg.id_,"⌔︙لا يوجد ملف بهاذا الاسم") 
-end
-return false
-end
-end
-
-------------------------------------------------------------------------------------------------------------
-if text and not redis:get(bot_id.."Status:Reply:Sudo"..msg.chat_id_) then
-if not redis:sismember(bot_id..'Spam_For_Bot'..msg.sender_user_id_,text) then
-local anemi = redis:get(bot_id.."Add:Rd:Sudo:Gif"..text)   
-local veico = redis:get(bot_id.."Add:Rd:Sudo:vico"..text)   
-local stekr = redis:get(bot_id.."Add:Rd:Sudo:stekr"..text)     
-local Text = redis:get(bot_id.."Add:Rd:Sudo:Text"..text)   
-local photo = redis:get(bot_id.."Add:Rd:Sudo:Photo"..text)
-local video = redis:get(bot_id.."Add:Rd:Sudo:Video"..text)
-local document = redis:get(bot_id.."Add:Rd:Sudo:File"..text)
-local audio = redis:get(bot_id.."Add:Rd:Sudo:Audio"..text)
-if Text then 
-tdcli_function({ID="GetUser",user_id_=msg.sender_user_id_},function(arg,data)
-local NumMsgg = redis:get(bot_id..'Num:Message:Userr'..msg.chat_id_..':'..msg.sender_user_id_) or 0
-local NumMsg =( redis:get(bot_id..'Num:Message:User'..msg.chat_id_..':'..msg.sender_user_id_) or 0 + NumMsgg)
-local TotalMsg = Total_message(NumMsg)
-local Status_Gps = Get_Rank(msg.sender_user_id_,msg.chat_id_)
-local NumMessageEdit = redis:get(bot_id..'Num:Message:Edit'..msg.chat_id_..msg.sender_user_id_) or 0
-local Text = Text:gsub('#username',(data.username_ or 'لا يوجد')) 
-local Text = Text:gsub('#name',data.first_name_)
-local Text = Text:gsub('#id',msg.sender_user_id_)
-local Text = Text:gsub('#edit',NumMessageEdit)
-local Text = Text:gsub('#msgs',NumMsg)
-local Text = Text:gsub('#stast',Status_Gps)
-send(msg.chat_id_, msg.id_,'['..Text..']')
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end,nil)
-end
-if stekr then 
-sendSticker(msg.chat_id_,msg.id_,stekr) 
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if veico then 
-sendVoice(msg.chat_id_, msg.id_,veico,"")
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if video then 
-sendVideo(msg.chat_id_, msg.id_,video,"")
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if anemi then 
-sendAnimation(msg.chat_id_, msg.id_,anemi,"")   
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if document then
-sendDocument(msg.chat_id_, msg.id_, document)     
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end  
-if audio then
-sendAudio(msg.chat_id_,msg.id_,audio)  
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end
-if photo then
-sendPhoto(msg.chat_id_,msg.id_,photo,"")
-redis:sadd(bot_id.."Spam_For_Bot"..msg.sender_user_id_,text) 
-end  
-end
-------------------------------------------------------------------------------------------------------------
-if text and redis:get(bot_id..'Set:Cmd:Start:Bots') then
-if text == 'الغاء ✖' then   
-send(msg.chat_id_, msg.id_,"⌔︙تم الغاء حفظ كليشه امر /start") 
-redis:del(bot_id..'Set:Cmd:Start:Bots') 
-return false
-end
-redis:set(bot_id.."Set:Cmd:Start:Bot",text)  
-send(msg.chat_id_, msg.id_,'⌔︙تم حفظ كليشه امر /start في البوت') 
-redis:del(bot_id..'Set:Cmd:Start:Bots') 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-end
+function Script(msg)
 if TypeForChat == ("ForUser") then
 if text == '/start' then  
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
@@ -2363,7 +726,7 @@ redis:setex(bot_id..'Ban:Cmd:Start'..msg.sender_user_id_,60,true)
 return false
 end
 if not Dev_TikToK(msg) and not redis:sismember(bot_id..'User:Ban:Pv',msg.sender_user_id_) and not redis:get(bot_id..'Status:Lock:Twasl') then
-send(msg.sender_user_id_,msg.id_,'⌔︙تم ارسال رسالتك الى المطور ← { ['..UserName..'] }')    
+send(msg.sender_user_id_,msg.id_,'⌔︙تم ارسال رسالتك الى المطور ← { [tahaj20] }')    
 local List_id = {Id_Dev,msg.sender_user_id_}
 for k,v in pairs(List_id) do   
 tdcli_function({ID="GetChat",chat_id_=v},function(arg,chat) end,nil)
@@ -2753,13 +1116,21 @@ end
 end 
 end
 if TypeForChat == ("ForSuppur") then
-if text ==  ' شنو رئيك بهاذا' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id.."Status:Fun:Bots"..msg.chat_id_) then     
+if text and text:match('^'..Name_Bot..' ') then
+data.message_.content_.text_ = data.message_.content_.text_:gsub('^'..Name_Bot..' ','')
+end
+if text then
+local NewCmmd = redis:get(bot_id.."Get:Reides:Commands:Group"..msg.chat_id_..":"..text)
+if NewCmmd then
+text = (NewCmmd or text)
+end;end
+if text ==  ""..Name_Bot..' شنو رئيك بهاذا' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id.."Status:Fun:Bots"..msg.chat_id_) then     
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, function(Arg,Data) 
 local Text_Fun = {'لوكي وزاحف من ساع زحفلي وحضرته 😒','خوش ولد و ورده مال الله 🙄','يلعب ع البنات 🙄', 'ولد زايعته الكاع 😶🙊','صاك يخبل ومعضل ','محلو وشواربه جنها مكناسه 😂🤷🏼‍♀️','اموت عليه 🌝','هوه غير الحب مال اني ❤️','مو خوش ولد صراحه ☹️','ادبسز وميحترم البنات  ', 'فد واحد قذر 🙄😒','ماطيقه كل ما اكمشه ريحته جنها بخاخ بف باف مال حشرات 😂🤷‍♀️','مو خوش ولد 🤓' } 
 send(msg.chat_id_, Data.id_,''..Text_Fun[math.random(#Text_Fun)]..'')   
 end,nil)
 return false
-elseif text == ' شنو رئيك بهاي' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id.."Status:Fun:Bots"..msg.chat_id_) then    
+elseif text == ""..Name_Bot..' شنو رئيك بهاي' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id.."Status:Fun:Bots"..msg.chat_id_) then    
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)},function(Arg, Data) 
 local Text_Fun = {'الكبد مال اني هيه ','ختولي ماحبها ','خانتني ويه صديقي 😔','بس لو الكفها اله اعضها 💔','خوش بنيه بس عده مكسرات زايده وناقصه منا ومنا وهيه تدري بنفسها 😒','جذابه ومنافقه سوتلي مشكله ويه الحب مالتي ','ئووووووووف اموت ع ربها ','ديرو بالكم منها تلعب ع الولد 😶 ضحكت ع واحد قطته ايفون 7 ','صديقتي وختي وروحي وحياتي ','فد وحده منحرفه 😥','ساكنه بالعلاوي ونته حدد بعد لسانها لسان دلاله 🙄🤐','ام سحوره سحرت اخويا وعلكته 6 سنوات 🤕','ماحبها 🙁','بله هاي جهره تسئل عليها ؟ ','بربك ئنته والله فارغ وبطران وماعدك شي تسوي جاي تسئل ع بنات العالم ولي يله 🏼','ياخي بنيه حبوبه بس لبعرك معمي عليها تشرب هواي 😹' } 
 send(msg.chat_id_,Data.id_,''..Text_Fun[math.random(#Text_Fun)]..'') 
@@ -2772,165 +1143,123 @@ if Data.content_.document_ then
 SetFile_Groups(msg,msg.chat_id_,Data.content_.document_.document_.persistent_id_ ,Data.content_.document_.file_name_)
 end;end,nil)
 end
-if text == ("اضف مطور") and tonumber(msg.reply_to_message_id_) ~= 0 and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-function FunctionStatus(arg, result)
-redis:sadd(bot_id.."Developer:Bot", result.sender_user_id_)
-Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم ترقيته مطور في البوت")  
-end
-tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
-return false
-end
-if text == ("حذف مطور") and tonumber(msg.reply_to_message_id_) ~= 0 and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-function FunctionStatus(arg, result)
-redis:srem(bot_id.."Developer:Bot", result.sender_user_id_)
-Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المطورين")  
-end
-tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
-return false
-end
-if text and text:match("^اضف مطور @(.*)$") and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-function FunctionStatus(arg, result)
-if (result.id_) then
-if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
-send(msg.chat_id_,msg.id_,"⌔︙عذرا اذا معرف قناة")   
-return false 
-end      
-redis:sadd(bot_id.."Developer:Bot", result.id_)
-Send_Options(msg,result.id_,"reply","⌔︙تم ترقيته مطور في البوت")  
-else
-send(msg.chat_id_, msg.id_,"⌔︙المعرف غلط ")
-end
-end
-tdcli_function ({ID = "SearchPublicChat",username_ = text:match("^اضف مطور @(.*)$")}, FunctionStatus, nil)
-return false
-end
-if text and text:match("^حذف مطور @(.*)$") and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-function FunctionStatus(arg, result)
-if (result.id_) then
-redis:srem(bot_id.."Developer:Bot", result.id_)
-Send_Options(msg,result.id_,"reply","⌔︙تم تنزيله من المطورين")  
-else
-send(msg.chat_id_, msg.id_,"⌔︙المعرف غلط ")
-end
-end
-tdcli_function ({ID = "SearchPublicChat",username_ = text:match("^حذف مطور @(.*)$")}, FunctionStatus, nil)
-return false
-end
-if text and text:match("^اضف مطور (%d+)$") and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-redis:sadd(bot_id.."Developer:Bot", text:match("^اضف مطور (%d+)$"))
-Send_Options(msg,text:match("^اضف مطور (%d+)$"),"reply","⌔︙تم ترقيته مطور في البوت")  
-return false
-end
-if text and text:match("^حذف مطور (%d+)$") and Dev_TikToK(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-redis:srem(bot_id.."Developer:Bot", text:match("^حذف مطور (%d+)$"))
-Send_Options(msg,text:match("^حذف مطور (%d+)$"),"reply","⌔︙تم تنزيله من المطورين")  
-return false
-end
+
 if text == 'جلب نسخه احتياطيه' and Dev_TikToK(msg) or text == 'جلب نسخه الكروبات' and Dev_TikToK(msg) then
-local list = redis:smembers(bot_id..'ChekBotAdd')  
-local t = '{"IdBot": '..bot_id..',"Groups":{'  
-for k,v in pairs(list) do   
-NAME = 'Tshake Chat'
-ASAS = redis:smembers(bot_id.."President:Group"..v)
-MNSH = redis:smembers(bot_id.."Constructor:Group"..v)
-MDER = redis:smembers(bot_id.."Manager:Group"..v)
-MOD = redis:smembers(bot_id.."Admin:Group"..v)
-link = redis:get(bot_id.."Status:link:set:Group"..v) or ''
-if k == 1 then
-t = t..'"'..v..'":{"tek":"'..NAME..'",'
-else
-t = t..',"'..v..'":{"tek":"'..NAME..'",'
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
 end
-if #ASAS ~= 0 then 
-t = t..'"President":['
-for k,v in pairs(ASAS) do
+local Groups = redis:smembers(bot_id..'ChekBotAdd')  
+local Get_Json = '{"IdBot": '..bot_id..',"Groups":{'  
+for k,v in pairs(Groups) do   
+local President = redis:smembers(bot_id.."President:Group"..v)
+local Constructor = redis:smembers(bot_id.."Constructor:Group"..v)
+local Manager = redis:smembers(bot_id.."Manager:Group"..v)
+local Admin = redis:smembers(bot_id.."Admin:Group"..v)
+local Vips = redis:smembers(bot_id.."Vip:Group"..v)
+local LinkGroup = redis:get(bot_id.."Status:link:set:Group"..v) 
+local WelcomeGroup = redis:get(bot_id.."Get:Welcome:Group"..v) or ''
+local Status_Dev = redis:get(bot_id.."Developer:Bot:Reply"..v) 
+local Status_Prt = redis:get(bot_id.."President:Group:Reply"..v) 
+local Status_Cto = redis:get(bot_id.."Constructor:Group:Reply"..v) 
+local Status_Own = redis:get(bot_id.."Manager:Group:Reply"..v) 
+local Status_Md = redis:get(bot_id.."Admin:Group:Reply"..v) 
+local Status_Vip = redis:get(bot_id.."Vip:Group:Reply"..v) 
+local Status_Mem = redis:get(bot_id.."Mempar:Group:Reply"..v) 
 if k == 1 then
-t =  t..'"'..v..'"'
+Get_Json = Get_Json..'"'..v..'":{'
 else
-t =  t..',"'..v..'"'
+Get_Json = Get_Json..',"'..v..'":{'
+end
+if #President ~= 0 then 
+Get_Json = Get_Json..'"President":['
+for k,v in pairs(President) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
 end
 end   
-t = t..'],'
+Get_Json = Get_Json..'],'
 end
-if #MOD ~= 0 then
-t = t..'"Admin":['
-for k,v in pairs(MOD) do
+if #Constructor ~= 0 then
+Get_Json = Get_Json..'"Constructor":['
+for k,v in pairs(Constructor) do
 if k == 1 then
-t =  t..'"'..v..'"'
+Get_Json = Get_Json..'"'..v..'"'
 else
-t =  t..',"'..v..'"'
+Get_Json = Get_Json..',"'..v..'"'
 end
 end   
-t = t..'],'
+Get_Json = Get_Json..'],'
 end
-if #MDER ~= 0 then
-t = t..'"Manager":['
-for k,v in pairs(MDER) do
+if #Manager ~= 0 then
+Get_Json = Get_Json..'"Manager":['
+for k,v in pairs(Manager) do
 if k == 1 then
-t =  t..'"'..v..'"'
+Get_Json = Get_Json..'"'..v..'"'
 else
-t =  t..',"'..v..'"'
+Get_Json = Get_Json..',"'..v..'"'
 end
 end   
-t = t..'],'
+Get_Json = Get_Json..'],'
 end
-if #MNSH ~= 0 then
-t = t..'"Constructor":['
-for k,v in pairs(MNSH) do
+if #Admin ~= 0 then
+Get_Json = Get_Json..'"Admin":['
+for k,v in pairs(Admin) do
 if k == 1 then
-t =  t..'"'..v..'"'
+Get_Json = Get_Json..'"'..v..'"'
 else
-t =  t..',"'..v..'"'
+Get_Json = Get_Json..',"'..v..'"'
 end
 end   
-t = t..'],'
+Get_Json = Get_Json..'],'
 end
-t = t..'"LinkGroup":"'..link..'"}' or ''
+if #Vips ~= 0 then
+t = t..'"Vips":['
+for k,v in pairs(Vips) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
 end
-t = t..'}}'
+end   
+Get_Json = Get_Json..'],'
+end
+if Status_Dev then
+Get_Json = Get_Json..'"Status_Dev":"'..Status_Dev..'",'
+end
+if Status_Prt then
+Get_Json = Get_Json..'"Status_Prt":"'..Status_Prt..'",'
+end
+if Status_Cto then
+Get_Json = Get_Json..'"Status_Cto":"'..Status_Cto..'",'
+end
+if Status_Own then
+Get_Json = Get_Json..'"Status_Own":"'..Status_Own..'",'
+end
+if Status_Md then
+Get_Json = Get_Json..'"Status_Md":"'..Status_Md..'",'
+end
+if Status_Vip then
+Get_Json = Get_Json..'"Status_Vip":"'..Status_Vip..'",'
+end
+if Status_Mem then
+Get_Json = Get_Json..'"Status_Mem":"'..Status_Mem..'",'
+end
+if LinkGroup then
+Get_Json = Get_Json..'"LinkGroup":"'..LinkGroup..'",'
+end
+Get_Json = Get_Json..'"WelcomeGroup":"'..WelcomeGroup..'"}'
+end
+Get_Json = Get_Json..'}}'
 local File = io.open('./lib/'..bot_id..'.json', "w")
-File:write(t)
+File:write(Get_Json)
 File:close()
-sendDocument(msg.chat_id_, msg.id_,'./lib/'..bot_id..'.json', '📮┇ عدد مجموعات التي في البوت { '..#list..'}')
+sendDocument(msg.chat_id_, msg.id_,'./lib/'..bot_id..'.json', '\n⌔︙تم جلب نسخه خاصه بالكروبات\n⌔︙يحتوي الملف على {'..#Groups..'} مجموعه')
 end
-
-
 if text == ("مسح قائمه العام") and Dev_TikToK(msg) or text == ("مسح المحظورين عام") and Dev_TikToK(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
@@ -3096,7 +1425,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 local list = redis:smembers(bot_id.."President:Group"..msg.chat_id_)
 Asase = "\n⌔︙قائمة المنشئين الاساسين في المجموعه\n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n"
 for k,v in pairs(list) do
@@ -3142,7 +1471,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 local list = redis:smembers(bot_id.."Constructor:Group"..msg.chat_id_)
 Monsh = "\n⌔︙قائمة منشئين المجموعه \n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n"
 for k,v in pairs(list) do
@@ -3163,7 +1492,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 local list = redis:smembers(bot_id.."Manager:Group"..msg.chat_id_)
 Moder = "\n⌔︙قائمة المدراء في المجموعه \n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n"
 for k,v in pairs(list) do
@@ -3313,7 +1642,7 @@ return false
 end
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم حظره عام من المجموعات")  
 redis:sadd(bot_id.."Removal:User:Groups", result.sender_user_id_)
-KickGroup(result.chat_id_, result.sender_user_id_)
+Kick_Group(result.chat_id_, result.sender_user_id_)
 end
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
 elseif text == ("الغاء العام") and tonumber(msg.reply_to_message_id_) ~= 0 and Dev_TikToK(msg) then
@@ -3328,7 +1657,30 @@ redis:srem(bot_id.."Removal:User:Groups", result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم الغاء حظره عام من المجموعات")  
 end
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
-
+elseif text == ("اضف مطور") and tonumber(msg.reply_to_message_id_) ~= 0 and Dev_TikToK(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
+function FunctionStatus(arg, result)
+redis:sadd(bot_id.."Developer:Bot", result.sender_user_id_)
+Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم ترقيته مطور في البوت")  
+end
+tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
+elseif text == ("حذف مطور") and tonumber(msg.reply_to_message_id_) ~= 0 and Dev_TikToK(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
+function FunctionStatus(arg, result)
+redis:srem(bot_id.."Developer:Bot", result.sender_user_id_)
+Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المطورين")  
+end
+tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
 elseif text == ("رفع منشئ اساسي") and tonumber(msg.reply_to_message_id_) ~= 0 and DeveloperBot(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
@@ -3347,7 +1699,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."President:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المنشئين")  
@@ -3359,7 +1711,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 tdcli_function ({ID = "GetChatMember",chat_id_ = msg.chat_id_,user_id_ = msg.sender_user_id_},function(arg,da) 
 if da.status_.ID == "ChatMemberStatusCreator" then
 function FunctionStatus(arg, result)
@@ -3377,7 +1729,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."President:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المنشئين")  
@@ -3391,7 +1743,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:sadd(bot_id.."Constructor:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم ترقيته منشئ في المجموعه")  
@@ -3403,7 +1755,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."Constructor:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المنشئين")  
@@ -3415,7 +1767,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:sadd(bot_id.."Manager:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم ترقيته مدير المجموعه")  
@@ -3427,7 +1779,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."Manager:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المدراء")  
@@ -3439,7 +1791,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -3455,7 +1807,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."Admin:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من ادمنيه المجموعه")  
@@ -3467,7 +1819,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -3483,7 +1835,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."Vip:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تنزيله من المميزين")  
@@ -3495,7 +1847,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Lock:Ban:Group"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لقد تم تعطيل الحظر و الطرد من قبل المنشئين')
 return false
@@ -3514,7 +1866,7 @@ send(msg.chat_id_, msg.id_,"⌔︙لا توجد لدي صلاحية حظر ال�
 return false  
 end
 redis:sadd(bot_id.."Removal:User:Group"..msg.chat_id_, result.sender_user_id_)
-KickGroup(result.chat_id_, result.sender_user_id_)
+Kick_Group(result.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم حظره من المجموعه")  
 end,nil)   
 end
@@ -3526,7 +1878,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if tonumber(result.sender_user_id_) == tonumber(bot_id) then
 send(msg.chat_id_, msg.id_, "⌔︙لا يمكنك عمل هاذا الامر على البوت") 
@@ -3543,7 +1895,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
 return false  
@@ -3563,7 +1915,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 redis:srem(bot_id.."Silence:User:Group"..msg.chat_id_, result.sender_user_id_)
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم الغاء كتمه من هنا")  
@@ -3575,7 +1927,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
@@ -3585,33 +1937,13 @@ https.request("https://api.telegram.org/bot" .. token .. "/restrictChatMember?ch
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم الغاء تقييده")  
 end
 tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
-elseif text == ("تقيد") and tonumber(msg.reply_to_message_id_) ~= 0 and Admin(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end 
-function FunctionStatus(arg, result)
-if msg.can_be_deleted_ == false then 
-send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
-return false  
-end
-if Rank_Checking(result.sender_user_id_, msg.chat_id_) == true then
-send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(result.sender_user_id_,msg.chat_id_).."")
-return false
-end
-https.request("https://api.telegram.org/bot"..token.."/restrictChatMember?chat_id="..msg.chat_id_.."&user_id="..result.sender_user_id_)
-Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم تقييده")  
-end
-tdcli_function ({ID = "GetMessage",chat_id_ = msg.chat_id_,message_id_ = tonumber(msg.reply_to_message_id_)}, FunctionStatus, nil)
 elseif text and text:match("^حظر عام @(.*)$") and Dev_TikToK(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if result and result.type_ and result.type_.ID == ("ChannelChatInfo") then
@@ -3639,7 +1971,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 Send_Options(msg,result.id_,"reply","⌔︙تم الغاء حظره عام من المجموعات")  
@@ -3649,14 +1981,49 @@ send(msg.chat_id_, msg.id_,"⌔︙المعرف غلط ")
 end
 end
 tdcli_function ({ID = "SearchPublicChat",username_ = text:match("^الغاء العام @(.*)$") }, FunctionStatus, nil)
-
+elseif text and text:match("^اضف مطور @(.*)$") and Dev_TikToK(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
+function FunctionStatus(arg, result)
+if (result.id_) then
+if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
+send(msg.chat_id_,msg.id_,"⌔︙عذرا اذا معرف قناة")   
+return false 
+end      
+redis:sadd(bot_id.."Developer:Bot", result.id_)
+Send_Options(msg,result.id_,"reply","⌔︙تم ترقيته مطور في البوت")  
+else
+send(msg.chat_id_, msg.id_,"⌔︙المعرف غلط ")
+end
+end
+tdcli_function ({ID = "SearchPublicChat",username_ = text:match("^اضف مطور @(.*)$")}, FunctionStatus, nil)
+elseif text and text:match("^حذف مطور @(.*)$") and Dev_TikToK(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
+function FunctionStatus(arg, result)
+if (result.id_) then
+redis:srem(bot_id.."Developer:Bot", result.id_)
+Send_Options(msg,result.id_,"reply","⌔︙تم تنزيله من المطورين")  
+else
+send(msg.chat_id_, msg.id_,"⌔︙المعرف غلط ")
+end
+end
+tdcli_function ({ID = "SearchPublicChat",username_ = text:match("^حذف مطور @(.*)$")}, FunctionStatus, nil)
 elseif text and text:match("^رفع منشئ اساسي @(.*)$") and DeveloperBot(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
@@ -3676,7 +2043,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."President:Group"..msg.chat_id_, result.id_)
@@ -3694,7 +2061,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
@@ -3719,7 +2086,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."President:Group"..msg.chat_id_, result.id_)
@@ -3738,7 +2105,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
@@ -3758,7 +2125,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."Constructor:Group"..msg.chat_id_, result.id_)
@@ -3774,7 +2141,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if (result and result.type_ and result.type_.ID == "ChannelChatInfo") then
@@ -3794,7 +2161,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."Manager:Group"..msg.chat_id_, result.id_)
@@ -3810,7 +2177,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -3834,7 +2201,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."Admin:Group"..msg.chat_id_, result.id_)
@@ -3850,7 +2217,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -3874,7 +2241,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."Vip:Group"..msg.chat_id_, result.id_)
@@ -3889,16 +2256,16 @@ if redis:sismember(bot_id.."Validitys:Group"..msg.chat_id_,text:match("رفع (.
 function Status_reply(extra, result, success)   
 local statusrt = redis:get(bot_id.."Add:Validity:Group:Rt"..text:match("رفع (.*)")..msg.chat_id_)
 if statusrt == "مميز" and Admin(msg) then
-redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,text:match("رفع (.*)")) 
+redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,RTPA) 
 redis:sadd(bot_id.."Vip:Group"..msg.chat_id_,result.sender_user_id_)  
 elseif statusrt == "ادمن" and Owner(msg) then 
-redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,text:match("رفع (.*)"))
+redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,RTPA)
 redis:sadd(bot_id.."Admin:Group"..msg.chat_id_,result.sender_user_id_)  
 elseif statusrt == "مدير" and Constructor(msg) then
-redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,text:match("رفع (.*)"))  
+redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,RTPA)  
 redis:sadd(bot_id.."Manager:Group"..msg.chat_id_,result.sender_user_id_)  
 elseif statusrt == "عضو" and Admin(msg) then
-redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,text:match("رفع (.*)"))  
+redis:set(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_,RTPA)  
 end
 Send_Options(msg,result.sender_user_id_,"reply","⌔︙تم ترقيته : "..text:match("رفع (.*)").."")  
 end   
@@ -3908,7 +2275,7 @@ elseif text and text:match("تنزيل (.*)") and tonumber(msg.reply_to_message_
 if redis:sismember(bot_id.."Validitys:Group"..msg.chat_id_,text:match("تنزيل (.*)")) then
 function Status_reply(extra, result, success)   
 local statusrt = redis:get(bot_id.."Add:Validity:Group:Rt"..text:match("تنزيل (.*)")..msg.chat_id_)
-if statusrt == "مميز" and Admin(msg) then 
+if statusrt == "مميز" and Admin(msg) then
 redis:srem(bot_id.."Vip:Group"..msg.chat_id_,result.sender_user_id_)  
 redis:del(bot_id.."Add:Validity:Users"..msg.chat_id_..result.sender_user_id_)
 elseif statusrt == "ادمن" and Owner(msg) then 
@@ -3980,7 +2347,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Lock:Ban:Group"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لقد تم تعطيل الحظر و الطرد من قبل المنشئين')
 return false
@@ -4019,7 +2386,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 if tonumber(result.id_) == tonumber(bot_id) then
@@ -4040,7 +2407,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
 return false  
@@ -4068,7 +2435,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if (result.id_) then
 redis:srem(bot_id.."Silence:User:Group"..msg.chat_id_, result.id_)
@@ -4084,7 +2451,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
@@ -4148,7 +2515,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 function FunctionStatus(arg, result)
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
@@ -4168,7 +2535,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
 return false  
@@ -4206,7 +2573,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if Dev_TikToK_User(text:match("^حظر عام (%d+)$")) == true then
 send(msg.chat_id_, msg.id_, "⌔︙لا تستطيع حظر المطور الاساسي عام")
 return false 
@@ -4223,18 +2590,36 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:srem(bot_id.."Removal:User:Groups", text:match("^الغاء العام (%d+)$"))
 Send_Options(msg,text:match("^الغاء العام (%d+)$"),"reply","⌔︙تم الغاء حظره عام من المجموعات")  
 return false
 end
-if text and text:match("^رفع منشئ اساسي (%d+)$") and DeveloperBot(msg) then
+if text and text:match("^اضف مطور (%d+)$") and Dev_TikToK(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
+redis:sadd(bot_id.."Developer:Bot", text:match("^اضف مطور (%d+)$"))
+Send_Options(msg,text:match("^اضف مطور (%d+)$"),"reply","⌔︙تم ترقيته مطور في البوت")  
+elseif text and text:match("^حذف مطور (%d+)$") and Dev_TikToK(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
+redis:srem(bot_id.."Developer:Bot", text:match("^حذف مطور (%d+)$"))
+Send_Options(msg,text:match("^حذف مطور (%d+)$"),"reply","⌔︙تم تنزيله من المطورين")  
+elseif text and text:match("^رفع منشئ اساسي (%d+)$") and DeveloperBot(msg) then
+local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+data = JSON.decode(url)
+if data.Ch_Member.infoo ~= true then
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
+return false
+end
 redis:sadd(bot_id.."President:Group"..msg.chat_id_, text:match("^رفع منشئ اساسي (%d+)$") )
 Send_Options(msg,text:match("^رفع منشئ اساسي (%d+)$") ,"reply","⌔︙تم ترقيته منشئ اساسي")  
 elseif text and text:match("^تنزيل منشئ اساسي (%d+)$") and DeveloperBot(msg) then
@@ -4243,7 +2628,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:srem(bot_id.."President:Group"..msg.chat_id_, text:match("^تنزيل منشئ اساسي (%d+)$") )
 Send_Options(msg,text:match("^تنزيل منشئ اساسي (%d+)$") ,"reply","⌔︙تم تنزيله من المنشئين")  
 elseif text and text:match("^رفع منشئ (%d+)$") and PresidentGroup(msg) then
@@ -4252,7 +2637,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:sadd(bot_id.."Constructor:Group"..msg.chat_id_, text:match("^رفع منشئ (%d+)$"))
 Send_Options(msg,text:match("^رفع منشئ (%d+)$"),"reply","⌔︙تم ترقيته منشئ في المجموعه")  
 elseif text and text:match("^تنزيل منشئ (%d+)$") and PresidentGroup(msg) then
@@ -4261,15 +2646,15 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:srem(bot_id.."Constructor:Group"..msg.chat_id_, text:match("^تنزيل منشئ (%d+)$"))
 Send_Options(msg,text:match("^تنزيل منشئ (%d+)$"),"reply","⌔︙تم تنزيله من المنشئين")  
 elseif text and text:match("^رفع مدير (%d+)$") and Constructor(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
+local url,res = http.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
+send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }')   
+return false 
 end 
 redis:sadd(bot_id.."Manager:Group"..msg.chat_id_, text:match("^رفع مدير (%d+)$") )
 Send_Options(msg,text:match("^رفع مدير (%d+)$") ,"reply","⌔︙تم ترقيته مدير المجموعه")  
@@ -4279,7 +2664,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:srem(bot_id.."Manager:Group"..msg.chat_id_, text:match("^تنزيل مدير (%d+)$") )
 Send_Options(msg,text:match("^تنزيل مدير (%d+)$") ,"reply","⌔︙تم تنزيله من المدراء")  
 elseif text and text:match("^رفع ادمن (%d+)$") and Owner(msg) then
@@ -4288,7 +2673,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -4301,7 +2686,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 redis:srem(bot_id.."Admin:Group"..msg.chat_id_, text:match("^تنزيل ادمن (%d+)$"))
 Send_Options(msg,text:match("^تنزيل ادمن (%d+)$"),"reply","⌔︙تم تنزيله من ادمنيه المجموعه")  
 elseif text and text:match("^رفع مميز (%d+)$") and Admin(msg) then
@@ -4310,7 +2695,7 @@ data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
 send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
 return false
-end 
+end
 if not Constructor(msg) and redis:get(bot_id.."Status:Cheking:Seted"..msg.chat_id_) then 
 send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع رفع احد وذالك لان تم تعطيل الرفع من قبل المنشئين')
 return false
@@ -4342,7 +2727,7 @@ send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن")
 return false  
 end
 if Rank_Checking(text:match("^حظر (%d+)$") , msg.chat_id_) == true then
-send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(text:match("^حظر (%d+)$"),msg.chat_id_).."")
+send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(userid,msg.chat_id_).."")
 else
 tdcli_function ({ ID = "ChangeChatMemberStatus", chat_id_ = msg.chat_id_, user_id_ = text:match("^حظر (%d+)$") , status_ = { ID = "ChatMemberStatusKicked" },},function(arg,data) 
 if (data and data.code_ and data.code_ == 400 and data.message_ == "CHAT_ADMIN_REQUIRED") then 
@@ -4376,7 +2761,7 @@ send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة ال�
 return false
 end
 if Rank_Checking(text:match("^كتم (%d+)$"), msg.chat_id_) == true then
-send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(text:match("^كتم (%d+)$"),msg.chat_id_).."")
+send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(userid,msg.chat_id_).."")
 else
 if msg.can_be_deleted_ == false then 
 send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن") 
@@ -4400,10 +2785,10 @@ send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن")
 return false  
 end
 if Rank_Checking(text:match("^تقيد (%d+)$"), msg.chat_id_) then
-send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(text:match("^تقيد (%d+)$"),msg.chat_id_).."")
+send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(userid,msg.chat_id_).."")
 else
 https.request("https://api.telegram.org/bot" .. token .. "/restrictChatMember?chat_id=" .. msg.chat_id_ .. "&user_id=" ..text:match("^تقيد (%d+)$"))
-Send_Options(msg,text:match("^تقيد (%d+)$"),"reply","⌔︙تم تقييده في المجموعه")  
+Send_Options(msg,userid,"reply","⌔︙تم تقييده في المجموعه")  
 end
 elseif text and text:match('^تقيد (%d+) (.*)$') and tonumber(msg.reply_to_message_id_) ~= 0 and Admin(msg) then
 local TextEnd = {string.match(text, "^(تقيد) (%d+) (.*)$")}
@@ -4476,7 +2861,7 @@ send(msg.chat_id_, msg.id_,"⌔︙عذرآ البوت ليس ادمن")
 return false  
 end
 if Rank_Checking(text:match("^طرد (%d+)$") , msg.chat_id_) == true then
-send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(text:match("^طرد (%d+)$"),msg.chat_id_).."")
+send(msg.chat_id_, msg.id_, "\n⌔︙لا تستطيع -( حظر , طرد , كتم , تقيد ) : "..Get_Rank(userid,msg.chat_id_).."")
 else
 tdcli_function ({ ID = "ChangeChatMemberStatus", chat_id_ = msg.chat_id_, user_id_ = text:match("^طرد (%d+)$") , status_ = { ID = "ChatMemberStatusKicked" },},function(arg,data) 
 if (data and data.code_ and data.code_ == 400 and data.message_ == "CHAT_ADMIN_REQUIRED") then 
@@ -4568,7 +2953,7 @@ Send_Options(msg,msg.sender_user_id_,"Open_Status","⌔︙تم فتح التثب
 elseif text == "فتح التعديل" and msg.reply_to_message_id_ == 0 and Constructor(msg) then 
 redis:del(bot_id.."Status:Lock:edit"..msg.chat_id_) 
 Send_Options(msg,msg.sender_user_id_,"Open_Status","⌔︙تم فتح تعديل")  
-elseif text == "فتح تعديل الميديا" and msg.reply_to_message_id_ == 0 and Constructor(msg) then 
+elseif text == "فتح التعديل الميديا" and msg.reply_to_message_id_ == 0 and Constructor(msg) then 
 redis:del(bot_id.."Status:Lock:edit"..msg.chat_id_) 
 Send_Options(msg,msg.sender_user_id_,"Open_Status","⌔︙تم فتح تعديل")  
 elseif text == "فتح الكل" and msg.reply_to_message_id_ == 0 and Admin(msg) then 
@@ -5082,7 +3467,7 @@ elseif text == 'مسح الرسائل المضافه' then
 redis:del(bot_id..'Num:Message:Userr'..msg.chat_id_..':'..msg.sender_user_id_)
 send(msg.chat_id_, msg.id_,'⌔︙تم مسح جميع رسائلك ') 
 elseif text == 'مسح سحكاتي' or text == 'مسح تعديلاتي' then
-redis:del(bot_id..'Num:Message:Edit'..msg.chat_id_..msg.sender_user_id_)
+redis:del(bot_id..'Num:Message:Edit'..msg.chat_id_..':'..msg.sender_user_id_)
 send(msg.chat_id_, msg.id_,'⌔︙تم مسح جميع تعديلاتك ') 
 elseif text == 'مسح جهاتي' then
 redis:del(bot_id..'Num:Add:Memp'..msg.chat_id_..':'..msg.sender_user_id_)
@@ -5136,7 +3521,7 @@ local linkgpp = json:decode(https.request('https://api.telegram.org/bot'..token.
 if link then                              
 test = test..""..k.."- » "..v.."\n { "..link.."}\n"
 else                
-test = test..""..k.."- » "..v.."\n { "..(linkgpp.result or 'no link').."}\n"
+test = test..""..k.."- » "..v.."\n { "..linkgpp.result.."}\n"
 end
 end
 local f = io.open('Link_Groups.txt', 'w')
@@ -5151,7 +3536,7 @@ send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة ال�
 return false
 end
 local status_Link = redis:get(bot_id.."Link_Group"..msg.chat_id_)
-if status_Link then
+if status_Link == true then
 send(msg.chat_id_, msg.id_,"⌔︙جلب الرابط معطل") 
 return false  
 end
@@ -5161,7 +3546,7 @@ send(msg.chat_id_,msg.id_,"𖠐︙𝙡𝙞𝙣𝙠 𝙜𝙧𝙤𝙪𝙥 : \n [".
 else                
 local linkgpp = json:decode(https.request('https://api.telegram.org/bot'..token..'/exportChatInviteLink?chat_id='..msg.chat_id_))
 if linkgpp.ok == true then 
-send(msg.chat_id_,msg.id_,"𖠐︙𝙡𝙞𝙣𝙠 𝙜𝙧𝙤𝙪𝙥 :\n ["..linkgpp.result.."]\n••━━━━━━━━━━━━••")
+send(msg.chat_id_,msg.id_,"𖠐︙𝙡𝙞𝙣𝙠 𝙜𝙧𝙤𝙪𝙥 : \n ["..linkgpp.result.."]\n••━━━━━━━━━━━━••")
 redis:set(bot_id.."Status:link:set:Group"..msg.chat_id_,linkgpp.result)
 else
 send(msg.chat_id_, msg.id_,"⌔︙لا يوجد رابط للمجموعه")              
@@ -5539,14 +3924,14 @@ end,nil)end,nil)
 elseif text == "غادر" then 
 if DeveloperBot(msg) and not redis:get(bot_id.."Status:Lock:Left"..msg.chat_id_) then 
 tdcli_function ({ID = "ChangeChatMemberStatus",chat_id_=msg.chat_id_,user_id_=bot_id,status_={ID = "ChatMemberStatusLeft"},},function(e,g) end, nil) 
-send(msg.chat_id_, msg.id_,"⌔︙تم حبيبي حغادر") 
+send(msg.chat_id_, msg.id_,"⌔︙ تم مغادرة المجموعه") 
 redis:srem(bot_id.."ChekBotAdd",msg.chat_id_)  
 end
 elseif text and text:match("^غادر (-%d+)$") then
 local GP_ID = {string.match(text, "^(غادر) (-%d+)$")}
 if DeveloperBot(msg) and not redis:get(bot_id.."Status:Lock:Left"..msg.chat_id_) then 
 tdcli_function ({ID = "ChangeChatMemberStatus",chat_id_=GP_ID[2],user_id_=bot_id,status_={ID = "ChatMemberStatusLeft"},},function(e,g) end, nil) 
-send(msg.chat_id_, msg.id_,"⌔︙تم حبيبي حغادر") 
+send(msg.chat_id_, msg.id_,"⌔︙ تم مغادرة المجموعه") 
 send(GP_ID[2], 0,"⌔︙ تم مغادرة المجموعه بامر من مطور البوت") 
 redis:srem(bot_id.."ChekBotAdd",GP_ID[2])  
 end
@@ -5980,7 +4365,7 @@ local List = {
 𖣯 𝕀𝔻 🇮🇶⃤᷂ #id
 𖣯 𝕌𝕊𝔼ℝ 🇮🇶⃤᷂ #username
 𖣯 𝕄𝕊𝔾  🇮🇶⃤᷂ #msgs
-𖣯 𝕊??𝔸𝕋𝔼 🇮🇶⃤᷂ #stast
+𖣯 𝕊𝕋𝔸𝕋𝔼 🇮🇶⃤᷂ #stast
 𖣯 𝔼𝔻𝕀𝕋 🇮🇶⃤᷂ #edit
 ]],
 [[
@@ -6111,60 +4496,18 @@ end
 end,nil)   
 end,nil)   
 end
-
 if text and text:match('^تنظيف (%d+)$') and Admin(msg) or text and text:match('^حذف (%d+)$') and Admin(msg) or text and text:match('^مسح (%d+)$') and Admin(msg) then    
 local Msg_Num = tonumber(text:match('^تنظيف (%d+)$')) or tonumber(text:match('^حذف (%d+)$'))  or tonumber(text:match('^مسح (%d+)$')) 
 if Msg_Num > 1000 then 
 send(msg.chat_id_, msg.id_,'⌔︙تستطيع حذف *(1000)* رساله فقط') 
 return false  
 end  
-lk_keko = {[0]=msg.id_}
 local Message = msg.id_
-new = 0
 for i=1,tonumber(Msg_Num) do
+Delete_Message(msg.chat_id_,{[0]=Message})
 Message = Message - 1048576
-lk_keko[i] = Message
 end
-Delete_Message(msg.chat_id_,lk_keko)
 send(msg.chat_id_, msg.id_,'⌔︙تم ازالة *- '..Msg_Num..'* رساله من المجموعه')  
-elseif text and (text == "تنظيف جميع الميديا" or text == "تنظيف الميديا") and Admin(msg) then   
-    lk_keko = {[0]=msg.id_}
-    local Message = msg.id_
-    for i=1,100 do
-    Message = Message - 1048576
-    lk_keko[i] = Message
-    end
-    tdcli_function({ID = "GetMessages",chat_id_ = msg.chat_id_,message_ids_ = lk_keko},function(arg,data)
-        new = 0
-        lk_keko2 = {}
-        for i=0 ,data.total_count_ do
-            if data.messages_[i] and data.messages_[i].content_ and data.messages_[i].content_.ID ~= "MessageText" then
-                lk_keko2[new] = data.messages_[i].id_
-                new = new + 1
-            end
-        end
-        Delete_Message(msg.chat_id_,lk_keko2)
-    end,nil)  
-    send(msg.chat_id_, msg.id_,"⌔︙تم ازالة 100 من وسائط 🛡") 
-elseif text and (text == "تنظيف جميع الرسائل المعدله" or text == "تنظيف الرسائل المعدلة" or text == "تنظيف الرسائل المعدله") and Admin(msg) then   
-    lk_keko = {[0]=msg.id_}
-    local Message = msg.id_
-    for i=1,100 do
-    Message = Message - 1048576
-    lk_keko[i] = Message
-    end
-    tdcli_function({ID = "GetMessages",chat_id_ = msg.chat_id_,message_ids_ = lk_keko},function(arg,data)
-        new = 0
-        lk_keko2 = {}
-        for i=0 ,data.total_count_ do
-            if data.messages_[i] and (not data.messages_[i].edit_date_ or data.messages_[i].edit_date_ ~= 0) then
-                lk_keko2[new] = data.messages_[i].id_
-                new = new + 1
-            end
-        end
-        Delete_Message(msg.chat_id_,lk_keko2)
-    end,nil)  
-    send(msg.chat_id_, msg.id_,'⌔︙تم ازالة 100 رساله معدلة 🛡') 
 elseif text == 'ايدي' and tonumber(msg.reply_to_message_id_) > 0 and not redis:get(bot_id..'Status:Lock:Id:Photo'..msg.chat_id_) then
 function Function_Status(extra, result, success)
 tdcli_function ({ID = "GetUser",user_id_ = result.sender_user_id_},function(arg,data) 
@@ -6218,6 +4561,18 @@ end
 end
 tdcli_function ({ID = "SearchPublicChat",username_ = username}, Function_Status, nil)
 return false
+elseif text and text:match("^زخرفه (.*)$") then
+local TextZhrfa = text:match("^زخرفه (.*)$")
+zh = https.request('https://kk38abodypole.ga/API%20ZAKRAFA/en.php?en='..URL.escape(TextZhrfa)..'')
+zx = JSON.decode(zh)
+t = "\n$ قائمه الزخرفه \n............................\n"
+i = 0
+for k,v in pairs(zx.ok) do
+i = i + 1
+t = t..i.."-  "..v.." \n"
+end
+send(msg.chat_id_, msg.id_, t..'................................')
+end
 elseif text == "سمايلات" or text == "سمايل" then
 if redis:get(bot_id.."Status:Lock:Game:Group"..msg.chat_id_) then
 redis:del(bot_id.."Status:Set:Sma"..msg.chat_id_)
@@ -6424,15 +4779,15 @@ name = string.gsub(name,"⛈","🌨🌨🌨🌨🌨⛈🌨🌨🌨🌨")
 name = string.gsub(name,"🌥","⛅️⛅️⛅️⛅️⛅️⛅️🌥⛅️⛅️⛅️⛅️")
 name = string.gsub(name,"⛄️","☃☃☃☃☃☃⛄️☃☃☃☃")
 name = string.gsub(name,"👨‍🔬","👩‍🔬👩‍🔬👩‍🔬👩‍🔬👩‍🔬👩‍🔬👩‍🔬👩‍🔬👨‍🔬👩‍🔬👩‍🔬👩‍🔬")
-name = string.gsub(name,"👨‍💻","👩‍💻👩‍??👩‍‍💻👩‍‍💻👩‍💻👨‍💻👩‍💻👩‍💻👩‍💻")
+name = string.gsub(name,"👨‍💻","👩‍💻👩‍💻👩‍‍💻👩‍‍💻👩‍💻👨‍💻👩‍💻👩‍💻👩‍💻")
 name = string.gsub(name,"👨‍🔧","👩‍🔧👩‍🔧👩‍🔧👩‍🔧👩‍🔧👩‍🔧👨‍🔧👩‍🔧")
 name = string.gsub(name,"👩‍🍳","👨‍🍳👨‍🍳👨‍🍳👨‍🍳👨‍🍳👩‍🍳👨‍🍳👨‍🍳👨‍🍳")
 name = string.gsub(name,"🧚‍♀","🧚‍♂🧚‍♂🧚‍♂🧚‍♂🧚‍♀🧚‍♂🧚‍♂")
-name = string.gsub(name,"🧜‍♂","🧜‍♀🧜‍♀🧜‍♀🧜‍♀??‍♀🧚‍♂🧜‍♀🧜‍♀🧜‍♀")
+name = string.gsub(name,"🧜‍♂","🧜‍♀🧜‍♀🧜‍♀🧜‍♀🧜‍♀🧚‍♂🧜‍♀🧜‍♀🧜‍♀")
 name = string.gsub(name,"🧝‍♂","🧝‍♀🧝‍♀🧝‍♀🧝‍♀🧝‍♀🧝‍♂🧝‍♀🧝‍♀🧝‍♀")
 name = string.gsub(name,"🙍‍♂️","🙎‍♂️🙎‍♂️🙎‍♂️🙎‍♂️🙎‍♂️🙍‍♂️🙎‍♂️🙎‍♂️🙎‍♂️")
-name = string.gsub(name,"🧖‍♂️","🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♂️??‍♀️🧖‍♀️🧖‍♀️🧖‍♀️")
-name = string.gsub(name,"👬","👭👭👭👭👭👬??👭👭")
+name = string.gsub(name,"🧖‍♂️","🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♂️🧖‍♀️🧖‍♀️🧖‍♀️🧖‍♀️")
+name = string.gsub(name,"👬","👭👭👭👭👭👬👭👭👭")
 name = string.gsub(name,"👨‍👨‍👧","👨‍👨‍👦👨‍👨‍👦👨‍👨‍👦👨‍👨‍👦👨‍👨‍👧👨‍👨‍👦👨‍👨‍👦")
 name = string.gsub(name,"🕒","🕒🕒🕒🕒🕒🕒🕓🕒🕒🕒")
 name = string.gsub(name,"🕤","🕥🕥🕥🕥🕥🕤🕥🕥🕥")
@@ -6491,7 +4846,7 @@ send(msg.chat_id_, msg.id_,[[
  ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ 
 𓂅 . [TWS TikToK](t.me/Y_8ibot)     
 ]]) 
- elseif text == 'الاوامر' and Admin(msg) then
+elseif text == 'الاوامر' and Admin(msg) then
 local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
 data = JSON.decode(url)
 if data.Ch_Member.infoo ~= true then
@@ -6687,7 +5042,7 @@ send(msg.chat_id_, msg.id_,[[*
 ⌔︙مجوهراتي ← لعرض عدد الارباح
 ⌔︙بيع مجوهراتي ← + { العدد } 
 ⌔︙لبيع كل مجوهره مقابل ← {50} رساله
-*]])
+*]]) 
 elseif text == 'رسائلي' then
 local NumMsgg1 = redis:get(bot_id..'Num:Message:Userr'..msg.chat_id_..':'..msg.sender_user_id_) or 0
 local nummsg = redis:get(bot_id..'Num:Message:User'..msg.chat_id_..':'..msg.sender_user_id_) or 1 
@@ -7002,481 +5357,5 @@ redis:del(bot_id..'Texting:DevTikToK')
 send(msg.chat_id_, msg.id_,'⌔︙ تم حذف كليشه المطور')
 end
 end
-------------------------------------------------------------------------------------------------------------
-if text == 'تفعيل' and DeveloperBot(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
 end
-if TypeForChat ~= 'ForSuppur' then
-send(msg.chat_id_, msg.id_,'🚸¦ يجب تحويل المجموعة الى خارقة. او وضع معرف للمجموعه لتصبح عامه ثم ارفع البوت وارسل تفعيل⚙️') 
-return false
-end
-if msg.can_be_deleted_ == false then 
-send(msg.chat_id_, msg.id_,'⌔︙البوت ليس ادمن يرجى ترقيتي !') 
-return false  
-end
-tdcli_function ({ ID = "GetChannelFull", channel_id_ = msg.chat_id_:gsub("-100","")}, function(arg,data)  
-if tonumber(data.member_count_) < tonumber(redis:get(bot_id..'Num:Add:Bot') or 0) and not Dev_TikToK(msg) then
-send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع تفعيل المجموعه بسبب قلة عدد اعضاء المجموعه يجب ان يكون اكثر من *:'..(redis:get(bot_id..'Num:Add:Bot') or 0)..'* عضو')
-return false
-end
-tdcli_function ({ID = "GetUser",user_id_ = msg.sender_user_id_},function(extra,result,success)
-tdcli_function({ID ="GetChat",chat_id_=msg.chat_id_},function(arg,chat)  
-if redis:sismember(bot_id..'ChekBotAdd',msg.chat_id_) then
-send(msg.chat_id_, msg.id_,'⌔︙تم تفعيل المجموعه مسبقا')
-else
-tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,data) 
-local admins = data.members_
-for i=0 , #admins do
-if data.members_[i].status_.ID == "ChatMemberStatusCreator" then
-owner_id = admins[i].user_id_
-redis:sadd(bot_id.."President:Group"..msg.chat_id_,owner_id)
-end
-end
-end,nil)   
-Send_Options(msg,result.id_,'reply_Add','⌔︙تم تفعيل مجموعه '..chat.title_..'')
-redis:sadd(bot_id..'ChekBotAdd',msg.chat_id_)
-local Name1 = result.first_name_
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub("`","") 
-local Name1 = Name1:gsub("*","") 
-local Name1 = Name1:gsub("{","") 
-local Name1 = Name1:gsub("}","") 
-local Name = '['..Name1..'](tg://user?id='..result.id_..')'
-local NameChat = chat.title_
-local NameChat = NameChat:gsub('"',"") 
-local NameChat = NameChat:gsub('"',"") 
-local NameChat = NameChat:gsub("`","") 
-local NameChat = NameChat:gsub("*","") 
-local NameChat = NameChat:gsub("{","") 
-local NameChat = NameChat:gsub("}","") 
-local IdChat = msg.chat_id_
-local NumMember = data.member_count_
-local linkgpp = json:decode(https.request('https://api.telegram.org/bot'..token..'/exportChatInviteLink?chat_id='..msg.chat_id_))
-if linkgpp.ok == true then 
-LinkGp = linkgpp.result
-else
-LinkGp = 'لا يوجد'
-end
-if not Dev_TikToK(msg) then
-sendText(Id_Dev,'⌔︙تم تفعيل مجموعه جديده\n'..'\n⌔︙بواسطة : '..Name..''..'\n⌔︙ايدي المجموعه : `'..IdChat..'`'..'\n⌔︙عدد اعضاء المجموعه *: '..NumMember..'*'..'\n⌔︙اسم المجموعه : ['..NameChat..']'..'\n⌔︙الرابط : ['..LinkGp..']',0,'md')
-end
-end
-end,nil) 
-end,nil) 
-end,nil)
-end
-------------------------------------------------------------------------------------------------------------
-if text == 'تعطيل' and DeveloperBot(msg) then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-tdcli_function ({ID = "GetUser",user_id_ = msg.sender_user_id_},function(extra,result,success)
-tdcli_function({ID ="GetChat",chat_id_=msg.chat_id_},function(arg,chat)  
-if not redis:sismember(bot_id..'ChekBotAdd',msg.chat_id_) then
-send(msg.chat_id_, msg.id_,'⌔︙المجموعه بالتاكيد معطله')
-else
-Send_Options(msg,result.id_,'reply_Add','⌔︙تم تعطيل مجموعه '..chat.title_..'')
-redis:srem(bot_id..'ChekBotAdd',msg.chat_id_)  
-local Name1 = result.first_name_
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub("`","") 
-local Name1 = Name1:gsub("*","") 
-local Name1 = Name1:gsub("{","") 
-local Name1 = Name1:gsub("}","") 
-local Name = '['..Name1..'](tg://user?id='..result.id_..')'
-local NameChat = chat.title_
-NameChat = NameChat:gsub('"',"") 
-NameChat = NameChat:gsub('"',"") 
-NameChat = NameChat:gsub("`","") 
-NameChat = NameChat:gsub("*","") 
-NameChat = NameChat:gsub("{","") 
-NameChat = NameChat:gsub("}","") 
-local IdChat = msg.chat_id_
-local linkgpp = json:decode(https.request('https://api.telegram.org/bot'..token..'/exportChatInviteLink?chat_id='..msg.chat_id_))
-if linkgpp.ok == true then 
-LinkGp = linkgpp.result
-else
-LinkGp = 'لا يوجد'
-end
-if not Dev_TikToK(msg) then
-sendText(Id_Dev,'⌔︙تم تعطيل مجموعه جديده\n'..'\n⌔︙بواسطة : '..Name..''..'\n⌔︙ايدي المجموعه : `'..IdChat..'`\n⌔︙اسم المجموعه : ['..NameChat..']',0,'md')
-end
-end
-end,nil) 
-end,nil) 
-end
-------------------------------------------------------------------------------------------------------------
-if text == 'تفعيل' and not DeveloperBot(msg) and not redis:get(bot_id..'Free:Bot') then
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
-if TypeForChat ~= 'ForSuppur' then
-send(msg.chat_id_, msg.id_,'🚸¦ يجب تحويل المجموعة الى خارقة. او وضع معرف للمجموعه لتصبح عامه ثم ارفع البوت وارسل تفعيل⚙️') 
-return false
-end
-if msg.can_be_deleted_ == false then 
-send(msg.chat_id_, msg.id_,'⌔︙البوت ليس ادمن يرجى ترقيتي') 
-return false  
-end
-tdcli_function ({ ID = "GetChannelFull", channel_id_ = msg.chat_id_:gsub("-100","")}, function(arg,data)  
-tdcli_function({ID ="GetChat",chat_id_=msg.chat_id_},function(arg,chat)  
-tdcli_function ({ID = "GetUser",user_id_ = msg.sender_user_id_},function(extra,result,success)
-tdcli_function ({ID = "GetChatMember",chat_id_ = msg.chat_id_,user_id_ = msg.sender_user_id_},function(arg,DataChat) 
-if DataChat and DataChat.status_.ID == "ChatMemberStatusEditor" or DataChat and DataChat.status_.ID == "ChatMemberStatusCreator" then
-if DataChat and DataChat.user_id_ == msg.sender_user_id_ then
-if DataChat.status_.ID == "ChatMemberStatusCreator" then
-Status_Rt = 'المنشئ'
-elseif DataChat.status_.ID == "ChatMemberStatusEditor" then
-Status_Rt = 'الادمن'
-else 
-Status_Rt = 'عضو'
-end
-if redis:sismember(bot_id..'ChekBotAdd',msg.chat_id_) then
-send(msg.chat_id_, msg.id_,'⌔︙تم تفعيل المجموعه مسبقا')
-return false
-end
-if tonumber(data.member_count_) < tonumber(redis:get(bot_id..'Num:Add:Bot') or 0) and not Dev_TikToK(msg) then
-send(msg.chat_id_, msg.id_,'⌔︙لا تستطيع تفعيل المجموعه بسبب قلة عدد اعضاء المجموعه يجب ان يكون اكثر من *:'..(redis:get(bot_id..'Num:Add:Bot') or 0)..'* عضو')
-return false
-end
-Send_Options(msg,msg.sender_user_id_,'reply_Add','⌔︙تم تفعيل مجموعه '..chat.title_..'')
-tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,data) 
-local admins = data.members_
-for i=0 , #admins do
-if data.members_[i].status_.ID == "ChatMemberStatusCreator" then
-owner_id = admins[i].user_id_
-redis:sadd(bot_id.."President:Group"..msg.chat_id_,owner_id)
-end
-end
-end,nil)   
-redis:sadd(bot_id..'ChekBotAdd',msg.chat_id_)  
-redis:sadd(bot_id..'President:Group'..msg.chat_id_, msg.sender_user_id_)
-local LinkApi = json:decode(https.request('https://api.telegram.org/bot'..token..'/exportChatInviteLink?chat_id='..msg.chat_id_))
-if LinkApi.ok == true then 
-LinkChat = LinkApi.result
-else
-LinkChat = 'لا يوجد'
-end
-local Name1 = result.first_name_
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub('"',"") 
-local Name1 = Name1:gsub("`","") 
-local Name1 = Name1:gsub("*","") 
-local Name1 = Name1:gsub("{","") 
-local Name1 = Name1:gsub("}","") 
-local Name = '['..Name1..'](tg://user?id='..result.id_..')'
-local NumMember = data.member_count_
-local NameChat = chat.title_
-local NameChat = NameChat:gsub('"',"") 
-local NameChat = NameChat:gsub('"',"") 
-local NameChat = NameChat:gsub("`","") 
-local NameChat = NameChat:gsub("*","") 
-local NameChat = NameChat:gsub("{","") 
-local NameChat = NameChat:gsub("}","") 
-if not Dev_TikToK(msg) then
-sendText(Id_Dev,'⌔︙تم تفعيل مجموعه جديده\n⌔︙بواسطة : '..Name..'\n⌔︙موقعه في المجموعه : '..Status_Rt..'\n⌔︙ايدي المجموعه : `'..msg.chat_id_..'`\n⌔︙عدد اعضاء المجموعه *: '..NumMember..'*\n⌔︙اسم المجموعه : ['..NameChat..']\n⌔︙الرابط : ['..LinkChat..']',0,'md')
-end
-end
-end
-end,nil)   
-end,nil) 
-end,nil) 
-end,nil) 
-end
-------------------------------------------------------------------------------------------------------------
-end
-end
-------------------------------------------------------------------------------------------------------------
-local ban_Keko = {}
-function tdcli_update_callback(data)
-if data.ID == ("UpdateChannel") then 
-if data.channel_.status_.ID == ("ChatMemberStatusKicked") then 
-redis:srem(bot_id..'ChekBotAdd','-100'..data.channel_.id_)  
-end
-elseif data.ID == ("UpdateNewMessage") then
-msg = data.message_
-text = msg.content_.text_
-if (data.message_.content_.text_) then 
-    if (ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] and ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] == data.message_.content_.text_ and ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] and ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] >= 3) then 
-        if (ban_Keko["ban2:"..msg.chat_id_..msg.sender_user_id_]) then 
-            ban_Keko["ban2:"..msg.chat_id_..msg.sender_user_id_] = nil
---             send(msg.chat_id_, msg.id_,"⌔︙لتلح يا حلو 😉")  
-        end 
-        return false
-    elseif(ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] and ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] == data.message_.content_.text_ and ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_]) then 
-        ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] = ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] + 1;
-    elseif(ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] and ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] == data.message_.content_.text_) then 
-        ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] = 1;
-    else 
-        ban_Keko["ban"..msg.chat_id_..msg.sender_user_id_] = data.message_.content_.text_
-        ban_Keko["ban2:"..msg.chat_id_..msg.sender_user_id_] = true
-        ban_Keko["ban:count:"..msg.chat_id_..msg.sender_user_id_] = 1;
-    end 
-    
-end 
-if msg.date_ and msg.date_ < tonumber(os.time() - 30) then
-print("->> Old Message End <<-")
-return false
-end
-if text and text:match('^'..Name_Bot..' ') then
-data.message_.content_.text_ = data.message_.content_.text_:gsub('^'..Name_Bot..' ','')
-end
-if text then
-local NewCmmd = redis:get(bot_id.."Get:Reides:Commands:Group"..msg.chat_id_..":"..data.message_.content_.text_)
-if NewCmmd then
-data.message_.content_.text_ = (NewCmmd or data.message_.content_.text_)
-end;end
-------------------------------------------------------------------------------------------------------------
-tdcli_function({ID = "GetUser",user_id_ = msg.sender_user_id_},function(arg,data) 
-if data.username_ ~= false then
-redis:set(bot_id..'Save:Username'..msg.sender_user_id_,data.username_)
-end;end,nil)   
---------------------------------------------------------------------------------------------------------------
-if text and redis:get(bot_id.."Command:Reids:Group:Del"..msg.chat_id_..":"..msg.sender_user_id_) == "true" then
-local NewCmmd = redis:get(bot_id.."Get:Reides:Commands:Group"..msg.chat_id_..":"..text)
-if NewCmmd then
-redis:del(bot_id.."Get:Reides:Commands:Group"..msg.chat_id_..":"..text)
-redis:del(bot_id.."Command:Reids:Group:New"..msg.chat_id_)
-redis:srem(bot_id.."Command:List:Group"..msg.chat_id_,text)
-send(msg.chat_id_, msg.id_,"⌔︙تم ازالة هاذا ← { "..text.." }")  
-else
-send(msg.chat_id_, msg.id_,"⌔︙لا يوجد امر بهاذا الاسم")  
-end
-redis:del(bot_id.."Command:Reids:Group:Del"..msg.chat_id_..":"..msg.sender_user_id_)
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if text and redis:get(bot_id.."Command:Reids:Group"..msg.chat_id_..":"..msg.sender_user_id_) == "true" then
-redis:set(bot_id.."Command:Reids:Group:New"..msg.chat_id_,text)
-send(msg.chat_id_, msg.id_,"⌔︙ارسل الامر الجديد ليتم وضعه مكان القديم")  
-redis:del(bot_id.."Command:Reids:Group"..msg.chat_id_..":"..msg.sender_user_id_)
-redis:set(bot_id.."Command:Reids:Group:End"..msg.chat_id_..":"..msg.sender_user_id_,"true1") 
-return false
-end
-------------------------------------------------------------------------------------------------------------
-if text and redis:get(bot_id.."Command:Reids:Group:End"..msg.chat_id_..":"..msg.sender_user_id_) == "true1" then
-local NewCmd = redis:get(bot_id.."Command:Reids:Group:New"..msg.chat_id_)
-redis:set(bot_id.."Get:Reides:Commands:Group"..msg.chat_id_..":"..text,NewCmd)
-redis:sadd(bot_id.."Command:List:Group"..msg.chat_id_,text)
-send(msg.chat_id_, msg.id_,"⌔︙تم حفظ الامر باسم ← { "..text..' }')  
-redis:del(bot_id.."Command:Reids:Group:End"..msg.chat_id_..":"..msg.sender_user_id_)
-return false
-end
-if msg.content_.ID == "MessageChatAddMembers" then  
-redis:set(bot_id.."Who:Added:Me"..msg.chat_id_..":"..msg.content_.members_[0].id_,msg.sender_user_id_)
-local mem_id = msg.content_.members_  
-local Bots = redis:get(bot_id.."Status:Lock:Bot:kick"..msg.chat_id_) 
-for i=0,#mem_id do  
-if msg.content_.members_[i].type_.ID == "UserTypeBot" and not Admin(msg) and Bots == "kick" then   
-https.request("https://api.telegram.org/bot"..token.."/kickChatMember?chat_id="..msg.chat_id_.."&user_id="..msg.sender_user_id_)
-Get_Info = https.request("https://api.telegram.org/bot"..token.."/kickChatMember?chat_id="..msg.chat_id_.."&user_id="..mem_id[i].id_)
-local Json_Info = JSON.decode(Get_Info)
-if Json_Info.ok == true and #mem_id == i then
-local Msgs = {}
-Msgs[0] = msg.id_
-msgs_id = msg.id_-1048576
-for i=1 ,(150) do 
-msgs_id = msgs_id+1048576
-table.insert(Msgs,msgs_id)
-end
-tdcli_function ({ID = "GetMessages",chat_id_ = msg.chat_id_,message_ids_ = Msgs},function(arg,data);MsgsDel = {};for i=0 ,data.total_count_ do;if not data.messages_[i] then;if not MsgsDel[0] then;MsgsDel[0] = Msgs[i];end;table.insert(MsgsDel,Msgs[i]);end;end;if MsgsDel[0] then;tdcli_function({ID="DeleteMessages",chat_id_ = arg.chat_id_,message_ids_=MsgsDel},function(arg,data)end,nil);end;end,{chat_id_=msg.chat_id_}) tdcli_function({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersBots"},offset_ = 0,limit_ = 100 },function(arg,tah) local admins = tah.members_ for i=0 , #admins do if tah.members_[i].status_.ID ~= "ChatMemberStatusEditor" and not is_Admin(msg) then tdcli_function ({ID = "ChangeChatMemberStatus",chat_id_ = msg.chat_id_,user_id_ = admins[i].user_id_,status_ = {ID = "ChatMemberStatusKicked"},}, function(arg,f) end, nil) end end end,nil)  
-end
-end     
-end
-end
-if msg.content_.ID == "MessageChatAddMembers" then  
-local mem_id = msg.content_.members_  
-local Bots = redis:get(bot_id.."Status:Lock:Bot:kick"..msg.chat_id_) 
-for i=0,#mem_id do  
-if msg.content_.members_[i].type_.ID == "UserTypeBot" and not Admin(msg) and Bots == "del" then   
-Get_Info = https.request("https://api.telegram.org/bot"..token.."/kickChatMember?chat_id="..msg.chat_id_.."&user_id="..mem_id[i].id_)
-local Json_Info = JSON.decode(Get_Info)
-if Json_Info.ok == true and #mem_id == i then
-local Msgs = {}
-Msgs[0] = msg.id_
-msgs_id = msg.id_-1048576
-for i=1 ,(150) do 
-msgs_id = msgs_id+1048576
-table.insert(Msgs,msgs_id)
-end
-tdcli_function ({ID = "GetMessages",chat_id_ = msg.chat_id_,message_ids_ = Msgs},function(arg,data);MsgsDel = {};for i=0 ,data.total_count_ do;if not data.messages_[i] then;if not MsgsDel[0] then;MsgsDel[0] = Msgs[i];end;table.insert(MsgsDel,Msgs[i]);end;end;if MsgsDel[0] then;tdcli_function({ID="DeleteMessages",chat_id_ = arg.chat_id_,message_ids_=MsgsDel},function(arg,data)end,nil);end;end,{chat_id_=msg.chat_id_}) tdcli_function({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersBots"},offset_ = 0,limit_ = 100 },function(arg,tah) local admins = tah.members_ for i=0 , #admins do if tah.members_[i].status_.ID ~= "ChatMemberStatusEditor" and not is_Admin(msg) then tdcli_function ({ID = "ChangeChatMemberStatus",chat_id_ = msg.chat_id_,user_id_ = admins[i].user_id_,status_ = {ID = "ChatMemberStatusKicked"},}, function(arg,f) end, nil) end end end,nil)  
-end
-end     
-end
-end
-------------------------------------------------------------------------------------------------------------
-if tonumber(msg.sender_user_id_) ~= tonumber(bot_id) then  
-if msg.sender_user_id_ and RemovalUserGroup(msg.chat_id_,msg.sender_user_id_) then 
-KickGroup(msg.chat_id_,msg.sender_user_id_) 
-Delete_Message(msg.chat_id_, {[0] = msg.id_}) 
-return false  
-elseif msg.content_ and msg.content_.members_ and msg.content_.members_[0] and msg.content_.members_[0].id_ and RemovalUserGroup(msg.chat_id_,msg.content_.members_[0].id_) then 
-KickGroup(msg.chat_id_,msg.content_.members_[0].id_) 
-Delete_Message(msg.chat_id_, {[0] = msg.id_}) 
-return false
-elseif msg.sender_user_id_ and RemovalUserGroups(msg.sender_user_id_) then 
-KickGroup(msg.chat_id_,msg.sender_user_id_) 
-Delete_Message(msg.chat_id_, {[0] = msg.id_}) 
-return false 
-elseif msg.content_ and msg.content_.members_ and msg.content_.members_[0] and msg.content_.members_[0].id_ and RemovalUserGroups(msg.content_.members_[0].id_) then 
-KickGroup(msg.chat_id_,msg.content_.members_[0].id_) 
-Delete_Message(msg.chat_id_, {[0] = msg.id_})  
-return false  
-elseif msg.sender_user_id_ and MutedGroups(msg.chat_id_,msg.sender_user_id_) then 
-Delete_Message(msg.chat_id_, {[0] = msg.id_})  
-return false  
-end
-end
-if msg.content_.ID == "MessageChatDeletePhoto" or msg.content_.ID == "MessageChatChangePhoto" or msg.content_.ID == "MessagePinMessage" or msg.content_.ID == "MessageChatJoinByLink" or msg.content_.ID == "MessageChatAddMembers" or msg.content_.ID == "MessageChatChangeTitle" or msg.content_.ID == "MessageChatDeleteMember" then   
-if redis:get(bot_id.."Status:Lock:tagservr"..msg.chat_id_) then  
-Delete_Message(msg.chat_id_,{[0] = msg.id_})       
-return false
-end    
-elseif text and not redis:sismember(bot_id..'Spam_For_Bot'..msg.sender_user_id_,text) then
-redis:del(bot_id..'Spam_For_Bot'..msg.sender_user_id_) 
-
-end
-
---------------------------------------------------------------------------------------------------------------
-Dev_TikToK_File(msg,data)
-FilesTikToKBot(msg,data)
-elseif data.ID == ("UpdateMessageEdited") then
-tdcli_function ({ID = "GetMessage",chat_id_ = data.chat_id_,message_id_ = tonumber(data.message_id_)},function(extra, result, success)
-local textedit = result.content_.text_
-redis:incr(bot_id..'Num:Message:Edit'..result.chat_id_..result.sender_user_id_)
-if redis:get(bot_id.."Status:Lock:edit"..result.chat_id_) and not textedit and not PresidentGroup(result) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-local list = redis:smembers(bot_id.."President:Group"..result.chat_id_)
-if #list == 0 then
-Send_Options(result,result.sender_user_id_,"reply","⌔︙قام بالتعديل على الميديا")  
-else
-tt = "\n⌔︙يا منشئين\n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ \n"
-for k,v in pairs(list) do
-local username = redis:get(bot_id.."Save:Username" .. v)
-if username then
-tt = tt..""..k.."- ([@"..username.."])\n"
-else
-tt = tt..""..k.."- (`"..v.."`)\n"
-end
-end
-Send_Options(result,result.sender_user_id_,"reply",tt.."\n⌔︙قام بالتعديل على الميديا")  
-end
-end
-if not Vips(result) then
-------------------------------------------------------------------------
-if textedit and textedit:match("[Jj][Oo][Ii][Nn][Cc][Hh][Aa][Tt]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt].[Mm][Ee]") or textedit and textedit:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Ss][Cc][Oo].[Pp][Ee]") then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end 
-elseif textedit and textedit:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt].[Mm][Ee]") or textedit and textedit:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Ss][Cc][Oo].[Pp][Ee]") then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end 
-elseif textedit and textedit:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt].[Mm][Ee]") or textedit and textedit:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Ss][Cc][Oo].[Pp][Ee]") then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt].[Mm][Ee]") or textedit and textedit:match("[Tt][Ll][Gg][Rr][Mm].[Mm][Ee]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Ss][Cc][Oo].[Pp][Ee]") then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("[hH][tT][tT][pP][sT]") or textedit and textedit:match("[tT][eE][lL][eE][gG][rR][aA].[Pp][Hh]") or textedit and textedit:match("[Tt][Ee][Ll][Ee][Gg][Rr][Aa].[Pp][Hh]") then
-if redis:get(bot_id.."Status:Lock:Link"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("(.*)(@)(.*)") then
-if redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("@") then
-if redis:get(bot_id.."Status:Lock:User:Name"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("(.*)(#)(.*)") then
-if redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("#") then
-if redis:get(bot_id.."Status:Lock:hashtak"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end  
-elseif textedit and textedit:match("/") then
-if redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end 
-elseif textedit and textedit:match("(.*)(/)(.*)") then
-if redis:get(bot_id.."Status:Lock:Cmd"..msg.chat_id_) then
-Delete_Message(result.chat_id_,{[0] = data.message_id_}) 
-return false
-end 
-elseif textedit then
-local Text_Filter = redis:get(bot_id.."Filter:Reply2"..textedit..result.chat_id_)   
-if Text_Filter then    
-Delete_Message(result.chat_id_, {[0] = data.message_id_})     
-Send_Options(result,result.sender_user_id_,"reply","⌔︙"..Text_Filter)  
-return false
-end
-end
-end
-end,nil)
-elseif data.ID == ("UpdateMessageSendSucceeded") then
-local msg = data.message_
-local text = msg.content_.text_
-local Get_Msg_Pin = redis:get(bot_id..'Msg:Pin:Chat'..msg.chat_id_)
-if Get_Msg_Pin ~= nil then
-if text == Get_Msg_Pin then
-tdcli_function ({ID = "PinChannelMessage",channel_id_ = msg.chat_id_:gsub('-100',''),message_id_ = msg.id_,disable_notification_ = 0},function(arg,d) if d.ID == 'Ok' then;redis:del(bot_id..'Msg:Pin:Chat'..msg.chat_id_);end;end,nil)   
-elseif (msg.content_.sticker_) then 
-if Get_Msg_Pin == msg.content_.sticker_.sticker_.persistent_id_ then
-tdcli_function ({ID = "PinChannelMessage",channel_id_ = msg.chat_id_:gsub('-100',''),message_id_ = msg.id_,disable_notification_ = 0},function(arg,d) redis:del(bot_id..'Msg:Pin:Chat'..msg.chat_id_) end,nil)   
-end
-end
-if (msg.content_.animation_) then 
-if msg.content_.animation_.animation_.persistent_id_ == Get_Msg_Pin then
-tdcli_function ({ID = "PinChannelMessage",channel_id_ = msg.chat_id_:gsub('-100',''),message_id_ = msg.id_,disable_notification_ = 0},function(arg,d) redis:del(bot_id..'Msg:Pin:Chat'..msg.chat_id_) end,nil)   
-end
-end
-if (msg.content_.photo_) then
-if msg.content_.photo_.sizes_[0] then
-id_photo = msg.content_.photo_.sizes_[0].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[1] then
-id_photo = msg.content_.photo_.sizes_[1].photo_.persistent_id_
-end
-if msg.content_.photo_.sizes_[2] then
-id_photo = msg.content_.photo_.sizes_[2].photo_.persistent_id_
-end	
-if msg.content_.photo_.sizes_[3] then
-id_photo = msg.content_.photo_.sizes_[3].photo_.persistent_id_
-end
-if id_photo == Get_Msg_Pin then
-tdcli_function ({ID = "PinChannelMessage",channel_id_ = msg.chat_id_:gsub('-100',''),message_id_ = msg.id_,disable_notification_ = 0},function(arg,d) redis:del(bot_id..'Msg:Pin:Chat'..msg.chat_id_) end,nil)   
-end
-end
-end
-elseif data.ID == ("UpdateOption") and data.value_.value_ == ("Ready")  then
-
-end
-end
+return {TikToK = Script}
