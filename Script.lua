@@ -11,7 +11,7 @@ UserName = sudos.UserName_TikToK
 bot_id = token:match("(%d+)")  
 Id_Dev = sudos.Id_DevTikToK
 Ids_Dev = {sudos.Id_DevTikToK}
-Name_Bot = redis:get(bot_id.."Redis:Name:Bot") or "تيك توك"
+Name_Bot = redis:get(bot_id.."Redis:Name:Bot") or "كاسبر"
 function dl_cb(arg,data)
 -- var(data)  
 end

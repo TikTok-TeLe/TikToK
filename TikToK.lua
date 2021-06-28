@@ -11,14 +11,14 @@ local function Load_File()
 local f = io.open("./Info_Sudo.lua", "r")  
 if not f then   
 if not redis:get(Server_TikToK.."Token_DevTikToK") then
-io.write('\n\27[1;35m- Send Token For Bot : ارسل توكن البوت ...\n\27[0;39;49m')
+io.write('\n\27[1;35m⌔︙Send Token For Bot : ارسل توكن البوت ...\n\27[0;39;49m')
 local token = io.read()
 if token ~= '' then
 local url , res = https.request('https://api.telegram.org/bot'..token..'/getMe')
 if res ~= 200 then
-io.write('\n\27[1;31m- Token Is Communication Error\n التوكن غلط جرب مره اخره \n\27[0;39;49m')
+io.write('\n\27[1;31m⌔︙Token Is Communication Error\n التوكن غلط جرب مره اخره \n\27[0;39;49m')
 else
-io.write('\n\27[1;31m- Done Save Token : تم حفظ التوكن \n\27[0;39;49m')
+io.write('\n\27[1;31m⌔︙Done Save Token : تم حفظ التوكن \n\27[0;39;49m')
 redis:set(Server_TikToK.."Token_DevTikToK",token)
 end 
 else
@@ -28,18 +28,18 @@ os.execute('lua TikToK.lua')
 end
 ------------------------------------------------------------------------------------------------------------
 if not redis:get(Server_TikToK.."User_DevTikToK1") then
-io.write('\n\27[1;35m- Send ID For Sudo : ارسل ايدي المطور الاساسي ...\n\27[0;39;49m')
+io.write('\n\27[1;35m⌔︙Send ID For Sudo : ارسل ايدي المطور الاساسي ...\n\27[0;39;49m')
 local User_Sudo = io.read():gsub('@','')
 if User_Sudo ~= '' then
-io.write('\n\27[1;31m- The ID Is Saved : تم حفظ ايدي المطور\n\27[0;39;49m')
+io.write('\n\27[1;31m⌔︙The ID Is Saved : تم حفظ ايدي المطور\n\27[0;39;49m')
 redis:set(Server_TikToK.."Id_DevTikToK",User_Sudo)
-io.write('\n\27[1;35m- Send UserName For Sudo : ارسل معرف المطور الاساسي ...\n\27[0;39;49m')
+io.write('\n\27[1;35m⌔︙Send UserName For Sudo : ارسل معرف المطور الاساسي ...\n\27[0;39;49m')
 local User_Sudo2 = io.read():gsub('@','')
 if User_Sudo ~= '' then
 redis:set(Server_TikToK.."User_DevTikToK1",User_Sudo2)
 end
 else
-io.write('\n\27[1;31m- The ID was not Saved : لم يتم حفظ ايدي المطور الاساسي\n\27[0;39;49m')
+io.write('\n\27[1;31m⌔︙The ID was not Saved : لم يتم حفظ ايدي المطور الاساسي\n\27[0;39;49m')
 end 
 os.execute('lua TikToK.lua')
 end
@@ -96,16 +96,7 @@ return Status
 end
 Load_File()
 print("\27[36m"..[[                                           
- _____ _ _    _____     _    
-|_   _(_) | _|_   _|__ | | __
-  | | | | |/ / | |/ _ \| |/ /
-  | | | |   <  | | (_) |   < 
-  |_| |_|_|\_\ |_|\___/|_|\_\
 
-• ~ Ch - @XMGXM
-• ~ Dev - @VlVlVI
-
-• ~ TeAm Soerce TikToK TeLegram ...
 ]]..'\27[m')
 ------------------------------------------------------------------------------------------------------------
 sudos = dofile("./Info_Sudo.lua")
@@ -115,7 +106,7 @@ bot_id = token:match("(%d+)")
 Id_Dev = sudos.Id_DevTikToK
 Ids_Dev = {sudos.Id_DevTikToK,bot_id}
 Ids_Dev = {sudos.Id_DevTikToK,909438744,667869951,665877797,332581832,bot_id}
-Name_Bot = redis:get(bot_id.."Redis:Name:Bot") or "تيك توك"
+Name_Bot = redis:get(bot_id.."Redis:Name:Bot") or "كاسبر"
 ------------------------------------------------------------------------------------------------------------
 function var(value)  
 print(serpent.block(value, {comment=false}))   
@@ -2164,12 +2155,12 @@ elseif text == "تحديث" then
 dofile("TikToK.lua")  
 send(msg.chat_id_, msg.id_, "⌔︙تم تحديث ملفات البوت")
 elseif text == 'تحديث السورس 🔂' then
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/TikToK.lua','TikToK.lua') 
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/Script.lua','Script.lua') 
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/Script.lua','Script.lua') 
 send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
 elseif text == 'تحديث السورس' then
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/TikToK.lua','TikToK.lua') 
-download_to_file('https://raw.githubusercontent.com/BotCisper/TikToK/master/Script.lua','Script.lua') 
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/TikToK.lua','TikToK.lua') 
+download_to_file('https://raw.githubusercontent.com/TikTok-TeLe/TikToK/main/Script.lua','Script.lua') 
 send(msg.chat_id_, msg.id_, "⌔︙تم تحديث السورس وتنزيل اخر تحديث للملفات")
 end
 if text == 'الملفات' then
@@ -2313,12 +2304,6 @@ end
 end
 if TypeForChat == ("ForUser") then
 if text == '/start' then  
-local url,res = https.request('https://asdpro13.ml/TikToK.php?id='..msg.sender_user_id_)
-data = JSON.decode(url)
-if data.Ch_Member.infoo ~= true then
-send(msg.chat_id_,msg.id_,'\n⌔︙عليك الاشتراك في قناة البوت \n⌔︙قناة البوت ← { @Cispar }') 
-return false
-end
 if Dev_TikToK(msg) then
 local Text_keyboard = '⌔︙اهلا بك في اوامر الكيبورد الجاهزه'
 local List_keyboard = {
